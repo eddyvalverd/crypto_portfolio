@@ -20,7 +20,7 @@ services:
     networks:
       - crypto_network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U crypto_admin -d crypto_tracker"]
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -28,7 +28,7 @@ services:
   # pgAdmin 4
   pgadmin:
     image: dpage/pgadmin4:latest
-    container_name: crypto_tracker_pgadmin
+    container_name: postgres_pgadmin
     restart: always
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@cryptotracker.com
