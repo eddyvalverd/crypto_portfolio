@@ -1,4 +1,4 @@
-version: '3.8'
+
 
 services:
   # PostgreSQL Database
@@ -7,9 +7,9 @@ services:
     container_name: crypto_tracker_db
     restart: always
     environment:
-      POSTGRES_USER: crypto_admin
-      POSTGRES_PASSWORD: crypto_pass_2024
-      POSTGRES_DB: crypto_tracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
       PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
