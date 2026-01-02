@@ -47,7 +47,7 @@ INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
     amount, price_per_unit, fee, notes
 ) VALUES (
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Trading Account'),  -- extra parentheses
+    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),  -- extra parentheses
     '2026-01-02 06:53:38'::timestamp,
     'TRANSFER_IN',
     'USDT',
@@ -61,7 +61,7 @@ INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
     amount, price_per_unit, fee, notes
 ) VALUES (
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Trading Account'),  -- extra parentheses
+    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),  -- extra parentheses
     '2026-01-02 06:53:38'::timestamp,
     'TRANSFER_IN',
     'USDC',
@@ -75,7 +75,7 @@ INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
     amount, price_per_unit, fee, notes
 ) VALUES (
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Trading Account'),  -- extra parentheses
+    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),  -- extra parentheses
     '2026-01-02 06:53:38'::timestamp,
     'TRANSFER_IN',
     'XAUT',
