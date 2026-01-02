@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: crypto_tracker_db
+    restart: always
+    environment:
+      POSTGRES_USER: crypto_admin
+      POSTGRES_PASSWORD: crypto_pass_2024
+      POSTGRES_DB: crypto_tracker
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/01_init.sql:ro
+      - ./post_init.sql:/docker-entrypoint-initdb.d/02_post_init.sql:ro
+    networks:
+      - crypto_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crypto_admin -d crypto_tracker"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # pgAdmin 4
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: crypto_tracker_pgadmin
+    restart: always
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@cryptotracker.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin-servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - crypto_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+
+networks:
+  crypto_network:
+    driver: bridge

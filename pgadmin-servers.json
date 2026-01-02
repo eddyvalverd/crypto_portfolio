@@ -1,0 +1,15 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "Crypto Tracker DB",
+      "Group": "Servers",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "crypto_tracker",
+      "Username": "crypto_admin",
+      "Password": "crypto_pass_2024",
+      "SSLMode": "prefer",
+      "Comment": "Multi-Portfolio Crypto Tracker Database"
+    }
+  }
+}
