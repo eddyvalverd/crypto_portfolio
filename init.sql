@@ -1,7 +1,11 @@
 -- ============================================
 -- MULTI-PORTFOLIO CRYPTO TRACKER - PostgreSQL
 -- WITH DOUBLE-ENTRY ACCOUNTING
+-- COSTA RICAN TIME ZONE (America/Costa_Rica)
 -- ============================================
+
+-- Set default timezone for this session
+SET timezone = 'America/Costa_Rica';
 
 -- ============================================
 -- 1. CREATE TABLES
@@ -13,7 +17,7 @@ CREATE TABLE portfolios (
     name VARCHAR(100) UNIQUE NOT NULL,
     description TEXT,
     color VARCHAR(10), -- Hex color code
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
     is_active BOOLEAN DEFAULT TRUE
 );
 
@@ -23,14 +27,14 @@ CREATE TABLE crypto_prices (
     symbol VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(100),
     current_price DECIMAL(18, 8),
-    last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    last_updated TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica')
 );
 
 -- Transaction log with 4 types: TRANSFER_IN, TRANSFER_OUT, BUY, SELL
 CREATE TABLE transactions (
     transaction_id SERIAL PRIMARY KEY,
     portfolio_id INT REFERENCES portfolios(portfolio_id),
-    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    transaction_date TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
     transaction_type VARCHAR(20) CHECK (transaction_type IN ('TRANSFER_IN', 'TRANSFER_OUT', 'BUY', 'SELL')),
     crypto_symbol VARCHAR(20) NOT NULL,
     amount DECIMAL(18, 8) NOT NULL,
@@ -40,7 +44,7 @@ CREATE TABLE transactions (
     -- For double-entry linking (BUY/SELL pairs)
     linked_transaction_id INT REFERENCES transactions(transaction_id),
     trade_pair_id INT, -- Groups related transactions from same trade
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica')
 );
 
 CREATE INDEX idx_transactions_portfolio ON transactions(portfolio_id);
@@ -48,9 +52,6 @@ CREATE INDEX idx_transactions_crypto ON transactions(crypto_symbol);
 CREATE INDEX idx_transactions_date ON transactions(transaction_date);
 CREATE INDEX idx_transactions_type ON transactions(transaction_type);
 CREATE INDEX idx_transactions_trade_pair ON transactions(trade_pair_id);
-
-
-    
 
 -- ============================================
 -- 3. CORE STORED PROCEDURES
@@ -60,7 +61,7 @@ CREATE INDEX idx_transactions_trade_pair ON transactions(trade_pair_id);
 -- This creates BOTH transactions automatically (double-entry)
 CREATE OR REPLACE FUNCTION execute_trade(
     p_portfolio_id INT,
-    p_date TIMESTAMP,
+    p_date TIMESTAMPTZ,
     p_crypto_buy VARCHAR(20),      -- Crypto you're buying
     p_amount_buy DECIMAL(18, 8),   -- Amount you're buying
     p_crypto_sell VARCHAR(20),     -- Crypto you're selling/spending
@@ -79,7 +80,11 @@ DECLARE
     v_buy_tx_id INT;
     v_sell_tx_id INT;
     v_price_per_unit DECIMAL(18, 8);
+    v_date_cr TIMESTAMPTZ;
 BEGIN
+    -- Ensure date is in Costa Rica timezone
+    v_date_cr := p_date AT TIME ZONE 'America/Costa_Rica';
+    
     -- Generate unique trade pair ID
     v_trade_pair_id := nextval('transactions_transaction_id_seq');
     
@@ -99,7 +104,7 @@ BEGIN
         notes
     ) VALUES (
         p_portfolio_id,
-        p_date,
+        v_date_cr,
         'BUY',
         p_crypto_buy,
         p_amount_buy,
@@ -124,7 +129,7 @@ BEGIN
         notes
     ) VALUES (
         p_portfolio_id,
-        p_date,
+        v_date_cr,
         'SELL',
         p_crypto_sell,
         p_amount_sell,
@@ -149,7 +154,7 @@ $$ LANGUAGE plpgsql;
 -- Procedure: TRANSFER IN (deposit from external wallet/exchange)
 CREATE OR REPLACE FUNCTION transfer_in(
     p_portfolio_id INT,
-    p_date TIMESTAMP,
+    p_date TIMESTAMPTZ,
     p_crypto VARCHAR(20),
     p_amount DECIMAL(18, 8),
     p_cost_basis DECIMAL(18, 8) DEFAULT 0, -- Optional: what you originally paid for it
@@ -158,7 +163,11 @@ CREATE OR REPLACE FUNCTION transfer_in(
 RETURNS INT AS $$
 DECLARE
     v_transaction_id INT;
+    v_date_cr TIMESTAMPTZ;
 BEGIN
+    -- Ensure date is in Costa Rica timezone
+    v_date_cr := p_date AT TIME ZONE 'America/Costa_Rica';
+    
     INSERT INTO transactions (
         portfolio_id,
         transaction_date,
@@ -169,7 +178,7 @@ BEGIN
         notes
     ) VALUES (
         p_portfolio_id,
-        p_date,
+        v_date_cr,
         'TRANSFER_IN',
         p_crypto,
         p_amount,
@@ -185,7 +194,7 @@ $$ LANGUAGE plpgsql;
 -- Procedure: TRANSFER OUT (withdrawal to external wallet/exchange)
 CREATE OR REPLACE FUNCTION transfer_out(
     p_portfolio_id INT,
-    p_date TIMESTAMP,
+    p_date TIMESTAMPTZ,
     p_crypto VARCHAR(20),
     p_amount DECIMAL(18, 8),
     p_fee DECIMAL(18, 8) DEFAULT 0,
@@ -195,7 +204,11 @@ RETURNS INT AS $$
 DECLARE
     v_transaction_id INT;
     v_current_balance DECIMAL(18, 8);
+    v_date_cr TIMESTAMPTZ;
 BEGIN
+    -- Ensure date is in Costa Rica timezone
+    v_date_cr := p_date AT TIME ZONE 'America/Costa_Rica';
+    
     -- Check if sufficient balance exists
     SELECT get_crypto_balance(p_portfolio_id, p_crypto) INTO v_current_balance;
     
@@ -214,7 +227,7 @@ BEGIN
         notes
     ) VALUES (
         p_portfolio_id,
-        p_date,
+        v_date_cr,
         'TRANSFER_OUT',
         p_crypto,
         p_amount,
@@ -230,7 +243,7 @@ $$ LANGUAGE plpgsql;
 -- Procedure: Simple BUY with fiat/stablecoin (no double entry, just acquisition)
 CREATE OR REPLACE FUNCTION buy_with_fiat(
     p_portfolio_id INT,
-    p_date TIMESTAMP,
+    p_date TIMESTAMPTZ,
     p_crypto VARCHAR(20),
     p_amount DECIMAL(18, 8),
     p_price_per_unit DECIMAL(18, 8),
@@ -240,7 +253,11 @@ CREATE OR REPLACE FUNCTION buy_with_fiat(
 RETURNS INT AS $$
 DECLARE
     v_transaction_id INT;
+    v_date_cr TIMESTAMPTZ;
 BEGIN
+    -- Ensure date is in Costa Rica timezone
+    v_date_cr := p_date AT TIME ZONE 'America/Costa_Rica';
+    
     INSERT INTO transactions (
         portfolio_id,
         transaction_date,
@@ -252,7 +269,7 @@ BEGIN
         notes
     ) VALUES (
         p_portfolio_id,
-        p_date,
+        v_date_cr,
         'BUY',
         p_crypto,
         p_amount,
@@ -269,7 +286,7 @@ $$ LANGUAGE plpgsql;
 -- Procedure: Simple SELL to fiat/stablecoin (no double entry, just disposal)
 CREATE OR REPLACE FUNCTION sell_to_fiat(
     p_portfolio_id INT,
-    p_date TIMESTAMP,
+    p_date TIMESTAMPTZ,
     p_crypto VARCHAR(20),
     p_amount DECIMAL(18, 8),
     p_price_per_unit DECIMAL(18, 8),
@@ -280,7 +297,11 @@ RETURNS INT AS $$
 DECLARE
     v_transaction_id INT;
     v_current_balance DECIMAL(18, 8);
+    v_date_cr TIMESTAMPTZ;
 BEGIN
+    -- Ensure date is in Costa Rica timezone
+    v_date_cr := p_date AT TIME ZONE 'America/Costa_Rica';
+    
     -- Check if sufficient balance exists
     SELECT get_crypto_balance(p_portfolio_id, p_crypto) INTO v_current_balance;
     
@@ -300,7 +321,7 @@ BEGIN
         notes
     ) VALUES (
         p_portfolio_id,
-        p_date,
+        v_date_cr,
         'SELL',
         p_crypto,
         p_amount,
@@ -497,11 +518,11 @@ SELECT
 FROM v_holdings
 GROUP BY portfolio_id, portfolio_name;
 
--- View: Transaction History with Trade Pairing
+-- View: Transaction History with Trade Pairing (showing timestamps in Costa Rica time)
 CREATE OR REPLACE VIEW v_transaction_history AS
 SELECT 
     t.transaction_id,
-    t.transaction_date,
+    t.transaction_date AT TIME ZONE 'America/Costa_Rica' AS transaction_date_cr,
     p.name AS portfolio_name,
     t.transaction_type,
     t.crypto_symbol,
@@ -519,7 +540,7 @@ SELECT
         ELSE NULL
     END AS trade_counterpart,
     t.notes,
-    t.created_at
+    t.created_at AT TIME ZONE 'America/Costa_Rica' AS created_at_cr
 FROM transactions t
 JOIN portfolios p ON t.portfolio_id = p.portfolio_id
 ORDER BY t.transaction_date DESC, t.transaction_id DESC;
@@ -528,94 +549,14 @@ ORDER BY t.transaction_date DESC, t.transaction_id DESC;
 -- 6. USAGE EXAMPLES
 -- ============================================
 
--- ===========================================
--- QUICK VIEW: Check Testnet Portfolio Balances
--- ===========================================
-
--- View Binance Testnet balances
-/*
-SELECT * FROM get_portfolio_balances(
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio')
-);
-*/
-
--- View Bybit Testnet balances
-/*
-SELECT * FROM get_portfolio_balances(
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio')
-);
-*/
-
--- View OKX Testnet balances
-/*
-SELECT * FROM get_portfolio_balances(
-    (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio')
-);
-*/
-
--- View ALL testnet portfolios summary
-/*
-SELECT 
-    p.name AS portfolio_name,
-    ps.*
-FROM v_portfolio_summary ps
-JOIN portfolios p ON ps.portfolio_id = p.portfolio_id
-WHERE p.name LIKE '%Testnet%'
-ORDER BY ps.current_value DESC;
-*/
-
--- View detailed holdings for all testnet portfolios
-/*
-SELECT 
-    portfolio_name,
-    crypto_symbol,
-    total_amount,
-    ROUND(avg_cost_per_unit::NUMERIC, 2) AS avg_cost,
-    ROUND(current_value::NUMERIC, 2) AS current_value,
-    ROUND(profit_loss::NUMERIC, 2) AS profit_loss,
-    ROUND(profit_loss_percent::NUMERIC, 2) AS profit_loss_pct
-FROM v_holdings
-WHERE portfolio_name LIKE '%Testnet%'
-ORDER BY portfolio_name, current_value DESC;
-*/
-
--- ===========================================
--- TRADING EXAMPLES FOR TESTNET PORTFOLIOS
--- ===========================================
-
--- Example 1: Transfer IN (deposit BTC from external wallet)
-/*
-SELECT transfer_in(
-    p_portfolio_id := 1,
-    p_date := CURRENT_TIMESTAMP,
-    p_crypto := 'BTC',
-    p_amount := 0.5,
-    p_cost_basis := 20000,  -- What you originally paid
-    p_notes := 'Transfer from Coinbase'
-);
-*/
-
--- Example 2: Buy crypto with fiat/USDT
-/*
-SELECT buy_with_fiat(
-    p_portfolio_id := 1,
-    p_date := CURRENT_TIMESTAMP,
-    p_crypto := 'ETH',
-    p_amount := 10,
-    p_price_per_unit := 2900,
-    p_fee := 5,
-    p_notes := 'DCA purchase'
-);
-*/
-
--- Example 3: TRADE on Binance Testnet - Exchange USDT for BTC
+-- Example: Using current Costa Rica time
 /*
 SELECT * FROM execute_trade(
-    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
-    p_date := CURRENT_TIMESTAMP,
-    p_crypto_buy := 'BTC',      -- Receiving 0.01 BTC
+    p_portfolio_id := 1,
+    p_date := (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
+    p_crypto_buy := 'BTC',
     p_amount_buy := 0.01,
-    p_crypto_sell := 'USDT',    -- Spending 430 USDT
+    p_crypto_sell := 'USDT',
     p_amount_sell := 430,
     p_fee := 0.43,
     p_fee_crypto := 'USDT',
@@ -623,144 +564,28 @@ SELECT * FROM execute_trade(
 );
 */
 
--- Example 4: TRADE on Bybit Testnet - Exchange BTC for ETH
+-- Example: Specifying a specific Costa Rica date/time
 /*
-SELECT * FROM execute_trade(
-    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
-    p_date := CURRENT_TIMESTAMP,
-    p_crypto_buy := 'ETH',      -- Receiving 10 ETH
-    p_amount_buy := 10,
-    p_crypto_sell := 'BTC',     -- Spending ~0.067 BTC
-    p_amount_sell := 0.067,
-    p_fee := 0.00001,
-    p_fee_crypto := 'BTC',
-    p_notes := 'Swap BTC to ETH'
-);
-*/
-
--- Example 5: TRADE on OKX Testnet - Exchange ETH for BCH
-/*
-SELECT * FROM execute_trade(
-    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
-    p_date := CURRENT_TIMESTAMP,
-    p_crypto_buy := 'BCH',
-    p_amount_buy := 5,
-    p_crypto_sell := 'ETH',
-    p_amount_sell := 0.655,
-    p_fee := 0.001,
-    p_fee_crypto := 'ETH',
-    p_notes := 'Trading ETH for BCH'
-);
-*/
-
--- Example 6: Sell crypto to fiat/USDT on Binance
-/*
-SELECT sell_to_fiat(
-    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
-    p_date := CURRENT_TIMESTAMP,
-    p_crypto := 'BNB',
-    p_amount := 1,
-    p_price_per_unit := 310,
-    p_fee := 0.31,
-    p_notes := 'Sell BNB for USDT'
-);
-*/
-
--- Example 7: Transfer OUT (withdraw to external wallet)
-/*
-SELECT transfer_out(
+SELECT buy_with_fiat(
     p_portfolio_id := 1,
-    p_date := CURRENT_TIMESTAMP,
-    p_crypto := 'BTC',
-    p_amount := 0.2,
-    p_fee := 0.0001,
-    p_notes := 'Transfer to cold wallet'
+    p_date := '2025-01-02 10:30:00-06'::TIMESTAMPTZ, -- -06 is Costa Rica UTC offset
+    p_crypto := 'ETH',
+    p_amount := 10,
+    p_price_per_unit := 2900,
+    p_fee := 5,
+    p_notes := 'Morning DCA purchase'
 );
 */
 
--- Example 8: Check balance of BTC in Bybit portfolio
-/*
-SELECT get_crypto_balance(
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
-    'BTC'
-);
-*/
-
--- Example 9: Get all balances for Binance testnet
-/*
-SELECT * FROM get_portfolio_balances(
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio')
-);
-*/
-
--- Example 10: View trade details
-/*
-SELECT * FROM get_trade_details(1);  -- Replace 1 with actual trade_pair_id
-*/
-
--- Example 11: View all holdings
-/*
-SELECT * FROM v_holdings
-ORDER BY portfolio_name, current_value DESC;
-*/
-
--- Example 12: View transaction history with trade pairs
-/*
-SELECT * FROM v_transaction_history
-WHERE portfolio_name = 'Binance Testnet Portfolio'
-LIMIT 20;
-*/
-
--- Example 13: View portfolio summary
-/*
-SELECT * FROM v_portfolio_summary;
-*/
-
--- Example 14: Update crypto price
-/*
-UPDATE crypto_prices SET current_price = 44000 WHERE symbol = 'BTC';
-UPDATE crypto_prices SET current_price = 3000 WHERE symbol = 'ETH';
-*/
-
--- ===========================================
--- USEFUL QUERIES FOR TESTNET PORTFOLIOS
--- ===========================================
-
--- Compare all 3 testnet portfolios side by side
+-- View all transactions with Costa Rica timestamps
 /*
 SELECT 
-    p.name,
-    ROUND(ps.total_invested::NUMERIC, 2) AS invested,
-    ROUND(ps.current_value::NUMERIC, 2) AS value,
-    ROUND(ps.total_profit_loss::NUMERIC, 2) AS pnl,
-    ROUND(ps.total_profit_loss_percent::NUMERIC, 2) AS pnl_pct,
-    ps.unique_cryptos
-FROM v_portfolio_summary ps
-JOIN portfolios p ON ps.portfolio_id = p.portfolio_id
-WHERE p.name LIKE '%Testnet%'
-ORDER BY ps.current_value DESC;
-*/
-
--- Total value across all testnet portfolios
-/*
-SELECT 
-    SUM(current_value) AS total_testnet_value,
-    SUM(total_invested) AS total_testnet_invested,
-    SUM(total_profit_loss) AS total_testnet_pnl
-FROM v_portfolio_summary ps
-JOIN portfolios p ON ps.portfolio_id = p.portfolio_id
-WHERE p.name LIKE '%Testnet%';
-*/
-
--- Asset distribution across testnet portfolios
-/*
-SELECT 
+    transaction_id,
+    transaction_date_cr,
+    transaction_type,
     crypto_symbol,
-    COUNT(DISTINCT portfolio_name) AS portfolios_holding,
-    SUM(total_amount) AS total_amount,
-    ROUND(SUM(current_value)::NUMERIC, 2) AS total_value
-FROM v_holdings
-WHERE portfolio_name LIKE '%Testnet%'
-GROUP BY crypto_symbol
-ORDER BY total_value DESC;
+    amount,
+    portfolio_name
+FROM v_transaction_history
+LIMIT 10;
 */
