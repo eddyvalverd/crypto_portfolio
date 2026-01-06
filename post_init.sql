@@ -170,3 +170,16 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'ZEC',
     p_notes := 'Buy ZEC with USDT on Binance Testnet'
 );
+
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
+    p_date := '2026-01-06 14:52:07-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'ZEC',
+    p_amount_buy := 17.0920,
+    p_crypto_sell := 'USDT',
+    p_amount_sell := 8500.00,
+    p_fee := 0.0171092,
+    p_fee_crypto := 'ZEC',
+    p_notes := 'Buy ZEC with USDT on OKX Testnet'
+);
+
