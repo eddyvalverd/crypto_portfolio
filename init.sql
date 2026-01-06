@@ -694,7 +694,10 @@ WHERE cp.atr_30 IS NOT NULL
 -- based on 1% portfolio risk and 1.5x ATR stop-loss
 -- ============================================
 
--- Drop and recreate the view with the new column
+-- Drop the view first to ensure clean recreation
+--DROP VIEW IF EXISTS v_position_sizing_calculator;
+
+-- Recreate with all columns
 CREATE OR REPLACE VIEW v_position_sizing_calculator AS
 SELECT 
     ps.portfolio_id,
@@ -803,23 +806,6 @@ SELECT
         ELSE 
             NULL
     END AS longdays
-
-FROM v_portfolio_summary ps
-CROSS JOIN crypto_prices cp
-LEFT JOIN v_holdings h 
-    ON h.portfolio_id = ps.portfolio_id 
-    AND h.crypto_symbol = cp.symbol
-LEFT JOIN crypto_prices btc 
-    ON btc.symbol = 'BTC'
-
-WHERE cp.is_stablecoin = FALSE
-  AND cp.atr_30 IS NOT NULL
-  AND cp.atr_30 > 0
-  AND cp.current_price > 0
-
-ORDER BY 
-    ps.portfolio_id,
-    cp.symbol;
 
 FROM v_portfolio_summary ps
 CROSS JOIN crypto_prices cp
