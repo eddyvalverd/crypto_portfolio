@@ -768,7 +768,58 @@ SELECT
             (cp.atr_30 / cp.current_price)
         ELSE 
             NULL
-    END AS btc_volatility_ratio
+    END AS btc_volatility_ratio,
+    
+    -- Moving average periods adjusted by volatility
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 
+         AND cp.current_price > 0
+         AND btc.atr_30 IS NOT NULL AND btc.atr_30 > 0 
+         AND btc.current_price > 0 THEN
+            20 * ((btc.atr_30 / btc.current_price) / 
+                  (cp.atr_30 / cp.current_price))
+        ELSE 
+            NULL
+    END AS shortdays,
+    
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 
+         AND cp.current_price > 0
+         AND btc.atr_30 IS NOT NULL AND btc.atr_30 > 0 
+         AND btc.current_price > 0 THEN
+            50 * ((btc.atr_30 / btc.current_price) / 
+                  (cp.atr_30 / cp.current_price))
+        ELSE 
+            NULL
+    END AS mediumdays,
+    
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 
+         AND cp.current_price > 0
+         AND btc.atr_30 IS NOT NULL AND btc.atr_30 > 0 
+         AND btc.current_price > 0 THEN
+            200 * ((btc.atr_30 / btc.current_price) / 
+                   (cp.atr_30 / cp.current_price))
+        ELSE 
+            NULL
+    END AS longdays
+
+FROM v_portfolio_summary ps
+CROSS JOIN crypto_prices cp
+LEFT JOIN v_holdings h 
+    ON h.portfolio_id = ps.portfolio_id 
+    AND h.crypto_symbol = cp.symbol
+LEFT JOIN crypto_prices btc 
+    ON btc.symbol = 'BTC'
+
+WHERE cp.is_stablecoin = FALSE
+  AND cp.atr_30 IS NOT NULL
+  AND cp.atr_30 > 0
+  AND cp.current_price > 0
+
+ORDER BY 
+    ps.portfolio_id,
+    cp.symbol;
 
 FROM v_portfolio_summary ps
 CROSS JOIN crypto_prices cp
