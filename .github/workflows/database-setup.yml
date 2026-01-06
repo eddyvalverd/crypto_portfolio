@@ -148,8 +148,8 @@ jobs:
           
           # Check portfolios
           PORTFOLIOS=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "SELECT COUNT(*) FROM portfolios;")
-          if [ "$PORTFOLIOS" -ne 3 ]; then
-            echo "❌ Expected 3 portfolios, found $PORTFOLIOS"
+          if [ "$PORTFOLIOS" -ne 4 ]; then
+            echo "❌ Expected 4 portfolios, found $PORTFOLIOS"
             exit 1
           fi
           echo "✓ Portfolios: $PORTFOLIOS"

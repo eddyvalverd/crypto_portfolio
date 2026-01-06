@@ -7,7 +7,8 @@
 INSERT INTO portfolios (name, description, color) VALUES
     ('Binance Testnet Portfolio', 'Binance Testnet Trading Account', '#0bf031e4'),
     ('Bybit Testnet Portfolio', 'Bybit Testnet Trading Account', '#F7A600'),
-    ('OKX Testnet Portfolio', 'OKX Testnet Trading Account', '#d9cfcfff');
+    ('OKX Testnet Portfolio', 'OKX Testnet Trading Account', '#d9cfcfff'),
+    ('Binance Main Portfolio', 'Binance Main Trading Account', '#ff0000e4');
 
 -- Sample crypto prices (including testnet tokens)
 INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin) VALUES
@@ -101,6 +102,20 @@ INSERT INTO public.transactions(
     1.0,
     0,
     'Initial USDT deposit from OKX TestneT'
+);
+
+INSERT INTO public.transactions(
+    portfolio_id, transaction_date, transaction_type, crypto_symbol, 
+    amount, price_per_unit, fee, notes
+) VALUES (
+    (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Main Portfolio'),  -- extra parentheses
+    '2026-01-02 06:53:38'::timestamp,
+    'TRANSFER_IN',
+    'USDT',
+    6743.84692837,
+    1.0,
+    0,
+    'Initial USDT deposit from Binance Testnet'
 );
 
 -- Record the DASH/USDT trade
