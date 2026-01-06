@@ -240,13 +240,108 @@ jobs:
         env:
           PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
         run: |
-          echo "Testing execute_trade function..."
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 POSITION SIZING CALCULATOR - 1% RISK / 1.5x ATR METHOD"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
           
-          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
-            SELECT * FROM public.v_position_sizing_calculator;
-          "
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -A -F"§" -c "
+            SELECT 
+              portfolio_name || '§' ||
+              crypto_symbol || '§' ||
+              crypto_name || '§' ||
+              TO_CHAR(current_price, 'FM999,999,990.00') || '§' ||
+              TO_CHAR(suggested_stop_loss_price, 'FM999,999,990.00') || '§' ||
+              TO_CHAR(stop_loss_percent, 'FM990.00') || '§' ||
+              TO_CHAR(position_size_units, 'FM999,990.00000000') || '§' ||
+              TO_CHAR(position_size_usd, 'FM999,999,990.00') || '§' ||
+              TO_CHAR(position_weight_percent, 'FM990.00') || '§' ||
+              holding_status || '§' ||
+              COALESCE(TO_CHAR(current_holding_value, 'FM999,999,990.00'), 'N/A')
+            FROM v_position_sizing_calculator
+            ORDER BY portfolio_id, position_size_usd DESC;
+          " | while IFS='§' read -r portfolio crypto name price stop_loss stop_pct units usd_value weight status holding_value; do
+            
+            # Print portfolio header on first crypto
+            if [ "$last_portfolio" != "$portfolio" ]; then
+              if [ -n "$last_portfolio" ]; then
+                echo ""
+              fi
+              echo "┌─────────────────────────────────────────────────────────────┐"
+              echo "│ 🏦 $portfolio"
+              echo "└─────────────────────────────────────────────────────────────┘"
+              last_portfolio="$portfolio"
+            fi
+            
+            # Determine holding emoji
+            if [ "$status" = "HELD" ]; then
+              hold_emoji="✅"
+            else
+              hold_emoji="⚪"
+            fi
+            
+            echo ""
+            echo "  $hold_emoji $crypto ($name)"
+            echo "     💰 Current Price:    \$$price"
+            echo "     🛑 Stop Loss:        \$$stop_loss ($stop_pct%)"
+            echo "     📦 Position Size:    $units units"
+            echo "     💵 USD Value:        \$$usd_value"
+            echo "     📊 Portfolio Weight: $weight%"
+            if [ "$status" = "HELD" ]; then
+              echo "     🎯 Current Holding:  \$$holding_value"
+            fi
+            
+          done
           
-          echo "✓ Query positions working"
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✓ Position sizing analysis complete"
+          echo ""
+
+      - name: Show portfolio summaries
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "💼 PORTFOLIO SUMMARIES"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -A -F"§" -c "
+            SELECT 
+              portfolio_name || '§' ||
+              TO_CHAR(current_value, 'FM999,999,990.00') || '§' ||
+              TO_CHAR(total_profit_loss, 'FM999,999,990.00') || '§' ||
+              TO_CHAR(total_profit_loss_percent, 'FM990.00') || '§' ||
+              TO_CHAR(current_value * 0.01, 'FM999,990.00') || '§' ||
+              unique_cryptos
+            FROM v_portfolio_summary
+            ORDER BY portfolio_id;
+          " | while IFS='§' read -r name value pnl pnl_pct risk_amount cryptos; do
+            
+            # Determine profit emoji
+            if (( $(echo "$pnl_pct > 0" | bc -l 2>/dev/null || echo 0) )); then
+              pnl_emoji="📈"
+            elif (( $(echo "$pnl_pct < 0" | bc -l 2>/dev/null || echo 0) )); then
+              pnl_emoji="📉"
+            else
+              pnl_emoji="➖"
+            fi
+            
+            echo "┌─────────────────────────────────────────────────────────────┐"
+            echo "│ 🏦 $name"
+            echo "├─────────────────────────────────────────────────────────────┤"
+            echo "│ 💰 Total Value:        \$$value"
+            echo "│ $pnl_emoji P&L:               \$$pnl ($pnl_pct%)"
+            echo "│ 🎲 Risk per Trade:     \$$risk_amount (1%)"
+            echo "│ 🪙 Unique Cryptos:     $cryptos"
+            echo "└─────────────────────────────────────────────────────────────┘"
+            echo ""
+            
+          done
+          
+          echo "✓ Portfolio summaries complete"
+          echo ""
 
 
 
