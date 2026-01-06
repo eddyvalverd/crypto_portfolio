@@ -28,7 +28,8 @@ CREATE TABLE crypto_prices (
     symbol VARCHAR(20) UNIQUE NOT NULL,
     name VARCHAR(100),
     current_price DECIMAL(18, 8),
-    last_updated TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica')
+    last_updated TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
+    is_stablecoin BOOLEAN DEFAULT FALSE
 );
 
 -- Transaction log with 4 types: TRANSFER_IN, TRANSFER_OUT, BUY, SELL
@@ -60,6 +61,7 @@ CREATE INDEX idx_transactions_trade_pair ON transactions(trade_pair_id);
 
 -- Procedure: Execute a TRADE (BUY crypto with another crypto)
 -- This creates BOTH transactions automatically (double-entry)
+-- Step 3: Create improved execute_trade function
 CREATE OR REPLACE FUNCTION execute_trade(
     p_portfolio_id INT,
     p_date TIMESTAMPTZ,
@@ -80,8 +82,11 @@ DECLARE
     v_trade_pair_id INT;
     v_buy_tx_id INT;
     v_sell_tx_id INT;
-    v_price_per_unit DECIMAL(18, 8);
+    v_buy_price_per_unit DECIMAL(18, 8);
+    v_sell_price_per_unit DECIMAL(18, 8);
     v_date_cr TIMESTAMPTZ;
+    v_is_sell_stablecoin BOOLEAN;
+    v_is_buy_stablecoin BOOLEAN;
 BEGIN
     -- Ensure date is in Costa Rica timezone
     v_date_cr := p_date AT TIME ZONE 'America/Costa_Rica';
@@ -89,8 +94,29 @@ BEGIN
     -- Generate unique trade pair ID
     v_trade_pair_id := nextval('transactions_transaction_id_seq');
     
-    -- Calculate price per unit (how much of sell crypto per 1 buy crypto)
-    v_price_per_unit := p_amount_sell / NULLIF(p_amount_buy, 0);
+    -- Check if cryptos are stablecoins
+    SELECT COALESCE(is_stablecoin, FALSE) INTO v_is_sell_stablecoin
+    FROM crypto_prices WHERE symbol = p_crypto_sell;
+    
+    SELECT COALESCE(is_stablecoin, FALSE) INTO v_is_buy_stablecoin
+    FROM crypto_prices WHERE symbol = p_crypto_buy;
+    
+    -- Calculate price_per_unit intelligently based on whether they're stablecoins
+    IF v_is_sell_stablecoin THEN
+        -- Selling stablecoin: use 1.0 as the price for the stablecoin
+        v_sell_price_per_unit := 1.00;
+        -- Buying crypto: price is how much stablecoin per unit of crypto bought
+        v_buy_price_per_unit := p_amount_sell / NULLIF(p_amount_buy, 0);
+    ELSIF v_is_buy_stablecoin THEN
+        -- Buying stablecoin: use 1.0 as the price for the stablecoin
+        v_buy_price_per_unit := 1.00;
+        -- Selling crypto: price is how much stablecoin per unit of crypto sold
+        v_sell_price_per_unit := p_amount_buy / NULLIF(p_amount_sell, 0);
+    ELSE
+        -- Neither is stablecoin: use exchange rate between them
+        v_buy_price_per_unit := p_amount_sell / NULLIF(p_amount_buy, 0);
+        v_sell_price_per_unit := p_amount_buy / NULLIF(p_amount_sell, 0);
+    END IF;
     
     -- Create BUY transaction (receiving crypto)
     INSERT INTO transactions (
@@ -109,7 +135,7 @@ BEGIN
         'BUY',
         p_crypto_buy,
         p_amount_buy,
-        v_price_per_unit,
+        v_buy_price_per_unit,
         CASE WHEN p_fee_crypto = p_crypto_buy THEN p_fee ELSE 0 END,
         v_trade_pair_id,
         COALESCE(p_notes, '') || ' | Trading ' || p_crypto_sell || ' for ' || p_crypto_buy
@@ -134,7 +160,7 @@ BEGIN
         'SELL',
         p_crypto_sell,
         p_amount_sell,
-        1 / NULLIF(v_price_per_unit, 0), -- Inverse price
+        v_sell_price_per_unit,
         CASE WHEN p_fee_crypto = p_crypto_sell THEN p_fee ELSE 0 END,
         v_trade_pair_id,
         v_buy_tx_id,
@@ -149,6 +175,31 @@ BEGIN
     
     RETURN QUERY
     SELECT v_trade_pair_id, v_buy_tx_id, v_sell_tx_id;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Step 4: Helper function to add new cryptos with stablecoin flag
+CREATE OR REPLACE FUNCTION add_crypto_price(
+    p_symbol VARCHAR(20),
+    p_name VARCHAR(100),
+    p_current_price DECIMAL(18, 8),
+    p_is_stablecoin BOOLEAN DEFAULT FALSE
+)
+RETURNS INT AS $$
+DECLARE
+    v_crypto_id INT;
+BEGIN
+    INSERT INTO crypto_prices (symbol, name, current_price, is_stablecoin)
+    VALUES (p_symbol, p_name, p_current_price, p_is_stablecoin)
+    ON CONFLICT (symbol) DO UPDATE 
+    SET 
+        name = EXCLUDED.name,
+        current_price = EXCLUDED.current_price,
+        is_stablecoin = EXCLUDED.is_stablecoin,
+        last_updated = (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica')
+    RETURNING crypto_id INTO v_crypto_id;
+    
+    RETURN v_crypto_id;
 END;
 $$ LANGUAGE plpgsql;
 

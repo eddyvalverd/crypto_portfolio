@@ -10,13 +10,13 @@ INSERT INTO portfolios (name, description, color) VALUES
     ('OKX Testnet Portfolio', 'OKX Testnet Trading Account', '#d9cfcfff');
 
 -- Sample crypto prices (including testnet tokens)
-INSERT INTO crypto_prices (symbol, name, current_price) VALUES
-    ('BTC', 'Bitcoin', 93888.00),
-    ('USDT', 'Tether', 1.00),
-    ('USDC', 'USD Coin', 1.00),
-    ('DASH', 'DASH', 44.93) ,
-    ('BNB', 'Binance Coin', 908.50),
-    ('XAUT', 'Tether Gold', 4379.20);
+INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin) VALUES
+    ('BTC', 'Bitcoin', 93888.00, FALSE),
+    ('USDT', 'Tether', 1.00, TRUE),
+    ('USDC', 'USD Coin', 1.00, TRUE),
+    ('DASH', 'DASH', 44.93, FALSE),
+    ('BNB', 'Binance Coin', 908.50, FALSE),
+    ('XAUT', 'Tether Gold', 4379.20, FALSE);
 
 INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
