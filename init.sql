@@ -642,3 +642,48 @@ SELECT
 FROM v_transaction_history
 LIMIT 10;
 */
+
+-- ============================================
+-- View: Position Size Metrics by ATR
+-- Calculates position sizing metric based on volatility
+-- ============================================
+
+CREATE OR REPLACE VIEW v_position_size_metrics AS
+SELECT 
+    h.portfolio_id,
+    h.portfolio_name,
+    h.crypto_symbol,
+    cp.name AS crypto_name,
+    h.total_amount,
+    h.current_value,
+    h.total_cost,
+    h.profit_loss,
+    h.profit_loss_percent,
+    cp.current_price,
+    cp.atr_30,
+    cp.is_stablecoin,
+    -- Position size metric: (current_value * 0.01) / atr_30
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 THEN
+            (h.current_value * 0.01) / cp.atr_30
+        ELSE 
+            NULL
+    END AS position_size_metric,
+    -- Additional context: what percentage of portfolio this represents
+    (h.current_value / NULLIF(ps.current_value, 0)) * 100 AS portfolio_weight_percent,
+    -- Risk score: higher values indicate larger position relative to volatility
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 THEN
+            CASE 
+                WHEN (h.current_value * 0.01) / cp.atr_30 > 1.0 THEN 'HIGH'
+                WHEN (h.current_value * 0.01) / cp.atr_30 > 0.5 THEN 'MEDIUM'
+                ELSE 'LOW'
+            END
+        ELSE 
+            'NO_ATR_DATA'
+    END AS risk_level
+FROM v_holdings h
+JOIN crypto_prices cp ON h.crypto_symbol = cp.symbol
+JOIN v_portfolio_summary ps ON h.portfolio_id = ps.portfolio_id
+WHERE cp.atr_30 IS NOT NULL 
+  AND cp.atr_30 > 0;
