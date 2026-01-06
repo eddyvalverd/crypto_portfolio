@@ -11,13 +11,15 @@ INSERT INTO portfolios (name, description, color) VALUES
     ('Binance Main Portfolio', 'Binance Main Trading Account', '#ff0000e4');
 
 -- Sample crypto prices (including testnet tokens)
-INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin) VALUES
-    ('BTC', 'Bitcoin', 93888.00, FALSE),
-    ('USDT', 'Tether', 1.00, TRUE),
-    ('USDC', 'USD Coin', 1.00, TRUE),
-    ('DASH', 'DASH', 44.93, FALSE),
-    ('BNB', 'Binance Coin', 908.50, FALSE),
-    ('XAUT', 'Tether Gold', 4379.20, FALSE);
+INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30) VALUES
+    ('BTC', 'Bitcoin', 93888.00, FALSE, 1938.47),
+    ('USDT', 'Tether', 1.00, TRUE, 0.00),
+    ('USDC', 'USD Coin', 1.00, TRUE, 0.00),
+    ('DASH', 'DASH', 44.93, FALSE, 2.99),
+    ('BNB', 'Binance Coin', 908.50, FALSE, 21.88),
+    ('XAUT', 'Tether Gold', 4379.20, FALSE, 64.1),
+    ('ETH', 'Ethereum', 3275.00, FALSE, 85.35),
+    ('CHZ', 'Chiliz', 0.04388, FALSE, 0.00286);
 
 INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
