@@ -156,3 +156,4 @@ INSERT INTO transactions (
 SELECT * FROM get_portfolio_balances(
     (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio')
 );
+

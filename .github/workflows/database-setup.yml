@@ -251,6 +251,21 @@ jobs:
           
           echo "✓ Trade execution function working"
 
+
+      - name: Test check positions
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Testing execute_trade function..."
+          
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT * FROM public.v_position_sizing_calculator;
+          "
+          
+          echo "✓ Query positions working"
+
+
+
       - name: Generate validation report
         env:
           PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}

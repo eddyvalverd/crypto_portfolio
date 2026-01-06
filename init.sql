@@ -687,3 +687,138 @@ JOIN crypto_prices cp ON h.crypto_symbol = cp.symbol
 JOIN v_portfolio_summary ps ON h.portfolio_id = ps.portfolio_id
 WHERE cp.atr_30 IS NOT NULL 
   AND cp.atr_30 > 0;
+
+-- ============================================
+-- View: Position Sizing Calculator (ATR 1.5x Method)
+-- Calculates position sizes for potential new positions
+-- based on 1% portfolio risk and 1.5x ATR stop-loss
+-- ============================================
+
+CREATE OR REPLACE VIEW v_position_sizing_calculator AS
+SELECT 
+    ps.portfolio_id,
+    ps.portfolio_name,
+    ps.current_value AS portfolio_value,
+    ps.total_profit_loss AS portfolio_pnl,
+    ps.total_profit_loss_percent AS portfolio_pnl_percent,
+    
+    -- Risk management
+    ps.current_value * 0.01 AS risk_per_trade_usd,  -- 1% risk rule
+    
+    -- Cryptocurrency details
+    cp.symbol AS crypto_symbol,
+    cp.name AS crypto_name,
+    cp.current_price,
+    cp.atr_30,
+    cp.is_stablecoin,
+    
+    -- Stop-loss calculation (1.5x ATR below current price)
+    cp.atr_30 * 1.5 AS stop_distance_atr,
+    cp.current_price - (cp.atr_30 * 1.5) AS suggested_stop_loss_price,
+    
+    -- Position sizing
+    -- Formula: (Portfolio Value × 1%) ÷ (ATR × 1.5)
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 THEN
+            (ps.current_value * 0.01) / (cp.atr_30 * 1.5)
+        ELSE 
+            NULL
+    END AS position_size_units,
+    
+    -- Position size in USD
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 THEN
+            ((ps.current_value * 0.01) / (cp.atr_30 * 1.5)) * cp.current_price
+        ELSE 
+            NULL
+    END AS position_size_usd,
+    
+    -- What percentage of portfolio this position would represent
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 THEN
+            (((ps.current_value * 0.01) / (cp.atr_30 * 1.5)) * cp.current_price) / 
+            NULLIF(ps.current_value, 0) * 100
+        ELSE 
+            NULL
+    END AS position_weight_percent,
+    
+    -- Risk/reward context
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 THEN
+            (cp.atr_30 * 1.5) / cp.current_price * 100
+        ELSE 
+            NULL
+    END AS stop_loss_percent,
+    
+    -- Current holding status (if any)
+    CASE 
+        WHEN h.total_amount IS NOT NULL THEN 'HELD'
+        ELSE 'NOT_HELD'
+    END AS holding_status,
+    h.total_amount AS current_holding_units,
+    h.current_value AS current_holding_value
+
+FROM v_portfolio_summary ps
+CROSS JOIN crypto_prices cp
+LEFT JOIN v_holdings h 
+    ON h.portfolio_id = ps.portfolio_id 
+    AND h.crypto_symbol = cp.symbol
+
+-- Filter criteria
+WHERE cp.is_stablecoin = FALSE
+  AND cp.atr_30 IS NOT NULL
+  AND cp.atr_30 > 0
+  AND cp.current_price > 0
+
+ORDER BY 
+    ps.portfolio_id,
+    cp.symbol;
+
+
+-- ============================================
+-- USAGE EXAMPLES
+-- ============================================
+
+-- Example 1: View all potential positions for portfolio 1
+/*
+SELECT 
+    crypto_symbol,
+    crypto_name,
+    current_price,
+    suggested_stop_loss_price,
+    stop_loss_percent,
+    position_size_units,
+    position_size_usd,
+    position_weight_percent,
+    holding_status
+FROM v_position_sizing_calculator
+WHERE portfolio_id = 1
+ORDER BY position_size_usd DESC;
+*/
+
+-- Example 2: Find cryptos where position size would be > 5% of portfolio
+/*
+SELECT 
+    portfolio_name,
+    crypto_symbol,
+    position_size_usd,
+    position_weight_percent,
+    stop_loss_percent
+FROM v_position_sizing_calculator
+WHERE position_weight_percent > 5
+ORDER BY position_weight_percent DESC;
+*/
+
+-- Example 3: Compare suggested position vs current holding
+/*
+SELECT 
+    portfolio_name,
+    crypto_symbol,
+    holding_status,
+    current_holding_value,
+    position_size_usd AS suggested_position_value,
+    position_size_usd - COALESCE(current_holding_value, 0) AS difference_usd
+FROM v_position_sizing_calculator
+WHERE holding_status = 'HELD'
+ORDER BY ABS(position_size_usd - COALESCE(current_holding_value, 0)) DESC;
+*/
