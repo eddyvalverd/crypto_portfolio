@@ -59,7 +59,7 @@ INSERT INTO public.transactions(
     '2026-01-02 06:53:38'::timestamp,
     'TRANSFER_IN',
     'USDT',
-    138979.4364,
+    140079.4364,
     1.0,
     0,
     'Initial USDT deposit from Bybit Testnet'
@@ -119,6 +119,19 @@ INSERT INTO public.transactions(
     1.0,
     0,
     'Initial USDT deposit from Binance Testnet'
+);
+
+-- Record the XAUT/USDT trade
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
+    p_date := '2026-01-02 09:10:39-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'XAUT',
+    p_amount_buy := 0.253764,
+    p_crypto_sell := 'USDT',
+    p_amount_sell := 1100,
+    p_fee := 0.000254018104,
+    p_fee_crypto := 'XAUT',
+    p_notes := 'Buy XAUT with USDT on Bybit'
 );
 
 -- Record the DASH/USDT trade
