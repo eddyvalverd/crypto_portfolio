@@ -20,7 +20,8 @@ INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30) VAL
     ('XAUT', 'Tether Gold', 4379.20, FALSE, 64.1),
     ('ETH', 'Ethereum', 3275.00, FALSE, 85.35),
     ('CHZ', 'Chiliz', 0.04388, FALSE, 0.00286),
-    ('ZEC', 'ZCash', 498.12, FALSE, 41.26);
+    ('ZEC', 'ZCash', 498.12, FALSE, 41.26),
+    ('TRX', 'TRON', 0.2933, FALSE, 0.0045);
 
 INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
