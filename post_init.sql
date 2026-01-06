@@ -14,7 +14,9 @@ INSERT INTO crypto_prices (symbol, name, current_price) VALUES
     ('BTC', 'Bitcoin', 93888.00),
     ('USDT', 'Tether', 1.00),
     ('USDC', 'USD Coin', 1.00),
-    ('DASH', 'DASH', 44.93);
+    ('DASH', 'DASH', 44.93) ,
+    ('BNB', 'Binance Coin', 908.50),
+    ('XAUT', 'Tether Gold', 4379.20);
 
 INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
@@ -99,4 +101,41 @@ INSERT INTO public.transactions(
     1.0,
     0,
     'Initial USDT deposit from OKX TestneT'
+);
+
+-- Record the DASH/USDT trade
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-02 09:10:39-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'DASH',
+    p_amount_buy := 33.6,
+    p_crypto_sell := 'USDT',
+    p_amount_sell := 1396.6145,
+    p_fee := 0.01985,
+    p_fee_crypto := 'DASH',
+    p_notes := 'Buy DASH with USDT on Binance'
+);
+
+-- Record the BNB fee as a separate transaction (since it's paid in a different crypto)
+INSERT INTO transactions (
+    portfolio_id,
+    transaction_date,
+    transaction_type,
+    crypto_symbol,
+    amount,
+    fee,
+    notes
+) VALUES (
+    (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    '2026-01-02 09:10:39-06'::TIMESTAMPTZ,
+    'TRANSFER_OUT',
+    'BNB',
+    0,
+    0.00048917,
+    'BNB fee for DASH/USDT trade'
+);
+
+-- Verify your balances after the trade
+SELECT * FROM get_portfolio_balances(
+    (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio')
 );
