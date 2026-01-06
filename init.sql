@@ -30,7 +30,7 @@ CREATE TABLE crypto_prices (
     current_price DECIMAL(18, 8),
     last_updated TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
     is_stablecoin BOOLEAN DEFAULT FALSE,
-    atr_30 DECIMAL(18, 8),
+    atr_30 DECIMAL(18, 8)
 );
 
 -- Transaction log with 4 types: TRANSFER_IN, TRANSFER_OUT, BUY, SELL
