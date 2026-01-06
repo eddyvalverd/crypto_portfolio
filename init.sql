@@ -715,6 +715,8 @@ SELECT
     cp.current_price,
     cp.atr_30,
     cp.is_stablecoin,
+    LEAST(0.02, GREATEST(0.005, 0.01 * ((btc.atr_30 / btc.current_price) / (cp.atr_30 / cp.current_price)))) AS adjusted_risk_percent
+
     
     -- Stop-loss calculation (1.5x ATR below current price)
     cp.atr_30 * 1.5 AS stop_distance_atr,
