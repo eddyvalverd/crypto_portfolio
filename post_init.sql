@@ -158,3 +158,15 @@ SELECT * FROM get_portfolio_balances(
     (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio')
 );
 
+-- Record the DASH/USDT trade
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-06 14:19:41-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'ZEC',
+    p_amount_buy := 3.079,
+    p_crypto_sell := 'USDT',
+    p_amount_sell := 1530.54011,
+    p_fee := 0.0030791985,
+    p_fee_crypto := 'ZEC',
+    p_notes := 'Buy ZEC with USDT on Binance Testnet'
+);
