@@ -72,11 +72,11 @@ INSERT INTO public.transactions(
     (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),  -- extra parentheses
     '2026-01-02 06:53:38'::timestamp,
     'TRANSFER_IN',
-    'USDC',
-    50000.00,
+    'USDT',
+    1100,
     1.0,
     0,
-    'Initial USDC deposit from Bybit Testnet'
+    'Initial add extra from XAUT deposit from Bybit Testnet'
 );
 
 INSERT INTO public.transactions(
@@ -86,11 +86,11 @@ INSERT INTO public.transactions(
     (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),  -- extra parentheses
     '2026-01-02 06:53:38'::timestamp,
     'TRANSFER_IN',
-    'XAUT',
-    0.253764,
-    4379.2,
+    'USDC',
+    50000.00,
+    1.0,
     0,
-    'Initial XAUT deposit from Bybit Testnet'
+    'Initial USDC deposit from Bybit Testnet'
 );
 
 INSERT INTO public.transactions(
@@ -105,6 +105,31 @@ INSERT INTO public.transactions(
     1.0,
     0,
     'Initial USDT deposit from OKX TestneT'
+);2026-01-02 09:10:39
+-- Record the DASH/USDT trade
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
+    p_date := '2026-01-02 09:10:39-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'XAUT',
+    p_amount_buy := 0.253764,
+    p_crypto_sell := 'USDT',
+    p_amount_sell := 4379.2,
+    p_fee := 0.000254018104,
+    p_fee_crypto := 'XAUT',
+    p_notes := 'Buy XAUT with USDT on Bybit Testnet'
+);
+
+-- Record the DASH/USDT trade
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-02 09:10:39-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'DASH',
+    p_amount_buy := 33.6,
+    p_crypto_sell := 'USDT',
+    p_amount_sell := 1396.6145,
+    p_fee := 0.01985,
+    p_fee_crypto := 'DASH',
+    p_notes := 'Buy DASH with USDT on Binance'
 );
 
 INSERT INTO public.transactions(
