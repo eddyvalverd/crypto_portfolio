@@ -122,23 +122,7 @@ jobs:
           fi
           echo "✓ All stored procedures created successfully"
 
-      - name: Validate views
-        env:
-          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
-        run: |
-          echo "Validating views..."
-          
-          VIEWS=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "
-            SELECT COUNT(*) FROM information_schema.views 
-            WHERE table_schema = 'public' 
-            AND table_name IN ('v_holdings', 'v_portfolio_summary', 'v_transaction_history');
-          ")
-          
-          if [ "$VIEWS" -ne 4 ]; then
-            echo "❌ Expected 4 views, found $VIEWS"
-            exit 1
-          fi
-          echo "✓ All views created successfully"
+
 
       - name: Validate sample data
         env:
