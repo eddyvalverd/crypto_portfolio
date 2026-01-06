@@ -134,8 +134,8 @@ jobs:
             AND table_name IN ('v_holdings', 'v_portfolio_summary', 'v_transaction_history');
           ")
           
-          if [ "$VIEWS" -ne 3 ]; then
-            echo "❌ Expected 3 views, found $VIEWS"
+          if [ "$VIEWS" -ne 4 ]; then
+            echo "❌ Expected 4 views, found $VIEWS"
             exit 1
           fi
           echo "✓ All views created successfully"
@@ -210,6 +210,7 @@ jobs:
           "
           
           echo "✓ All views working correctly"
+          
 
       - name: Test timezone handling
         env:
