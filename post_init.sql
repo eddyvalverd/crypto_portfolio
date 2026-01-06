@@ -79,19 +79,7 @@ INSERT INTO public.transactions(
     'Initial USDC deposit from Bybit Testnet'
 );
 
-INSERT INTO public.transactions(
-    portfolio_id, transaction_date, transaction_type, crypto_symbol, 
-    amount, price_per_unit, fee, notes
-) VALUES (
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),  -- extra parentheses
-    '2026-01-02 06:53:38'::timestamp,
-    'TRANSFER_IN',
-    'XAUT',
-    0.253764,
-    4379.2,
-    0,
-    'Initial XAUT deposit from Bybit Testnet'
-);
+
 
 INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
