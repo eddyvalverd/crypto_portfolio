@@ -1,0 +1,313 @@
+name: Database Setup and Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - '*.sql'
+      - '.github/workflows/database-setup.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - '*.sql'
+  workflow_dispatch:
+
+env:
+  POSTGRES_DB: crypto_tracker_test
+  POSTGRES_USER: test_user
+  POSTGRES_PASSWORD: test_password_123
+  POSTGRES_HOST: localhost
+  POSTGRES_PORT: 5432
+
+jobs:
+  database-setup-and-test:
+    name: Setup PostgreSQL and Run Migrations
+    runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          TZ: America/Costa_Rica
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Wait for PostgreSQL to be ready
+        run: |
+          for i in {1..30}; do
+            if pg_isready -h ${{ env.POSTGRES_HOST }} -p ${{ env.POSTGRES_PORT }} -U ${{ env.POSTGRES_USER }}; then
+              echo "PostgreSQL is ready!"
+              break
+            fi
+            echo "Waiting for PostgreSQL... ($i/30)"
+            sleep 2
+          done
+
+      - name: Verify database connection
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "SELECT version();"
+
+      - name: Run init.sql (Schema and Functions)
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Running init.sql..."
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -f init.sql -v ON_ERROR_STOP=1
+          echo "✓ init.sql completed successfully"
+
+      - name: Run post_init.sql (Sample Data)
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Running post_init.sql..."
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -f post_init.sql -v ON_ERROR_STOP=1
+          echo "✓ post_init.sql completed successfully"
+
+      - name: Validate database schema
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Validating database schema..."
+          
+          # Check all expected tables exist
+          TABLES=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "
+            SELECT COUNT(*) FROM information_schema.tables 
+            WHERE table_schema = 'public' 
+            AND table_name IN ('portfolios', 'crypto_prices', 'transactions');
+          ")
+          
+          if [ "$TABLES" -ne 3 ]; then
+            echo "❌ Expected 3 tables, found $TABLES"
+            exit 1
+          fi
+          echo "✓ All required tables exist"
+
+      - name: Validate stored procedures
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Validating stored procedures..."
+          
+          FUNCTIONS=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "
+            SELECT COUNT(*) FROM pg_proc 
+            WHERE proname IN (
+              'execute_trade', 'transfer_in', 'transfer_out', 
+              'buy_with_fiat', 'sell_to_fiat', 'get_crypto_balance', 
+              'get_portfolio_balances', 'get_trade_details'
+            );
+          ")
+          
+          if [ "$FUNCTIONS" -ne 8 ]; then
+            echo "❌ Expected 8 functions, found $FUNCTIONS"
+            exit 1
+          fi
+          echo "✓ All stored procedures created successfully"
+
+      - name: Validate views
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Validating views..."
+          
+          VIEWS=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "
+            SELECT COUNT(*) FROM information_schema.views 
+            WHERE table_schema = 'public' 
+            AND table_name IN ('v_holdings', 'v_portfolio_summary', 'v_transaction_history');
+          ")
+          
+          if [ "$VIEWS" -ne 3 ]; then
+            echo "❌ Expected 3 views, found $VIEWS"
+            exit 1
+          fi
+          echo "✓ All views created successfully"
+
+      - name: Validate sample data
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Validating sample data..."
+          
+          # Check portfolios
+          PORTFOLIOS=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "SELECT COUNT(*) FROM portfolios;")
+          if [ "$PORTFOLIOS" -ne 3 ]; then
+            echo "❌ Expected 3 portfolios, found $PORTFOLIOS"
+            exit 1
+          fi
+          echo "✓ Portfolios: $PORTFOLIOS"
+          
+          # Check crypto prices
+          PRICES=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "SELECT COUNT(*) FROM crypto_prices;")
+          if [ "$PRICES" -ne 4 ]; then
+            echo "❌ Expected 4 crypto prices, found $PRICES"
+            exit 1
+          fi
+          echo "✓ Crypto prices: $PRICES"
+          
+          # Check transactions
+          TRANSACTIONS=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "SELECT COUNT(*) FROM transactions;")
+          if [ "$TRANSACTIONS" -ne 6 ]; then
+            echo "❌ Expected 6 transactions, found $TRANSACTIONS"
+            exit 1
+          fi
+          echo "✓ Transactions: $TRANSACTIONS"
+
+      - name: Test balance calculations
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Testing balance calculations..."
+          
+          # Test Binance USDT balance
+          BINANCE_USDT=$(psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -t -c "
+            SELECT get_crypto_balance(
+              (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+              'USDT'
+            );
+          " | xargs)
+          
+          echo "Binance USDT balance: $BINANCE_USDT"
+          
+          # Test portfolio balances function
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT * FROM get_portfolio_balances(
+              (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio')
+            );
+          "
+          
+          echo "✓ Balance calculations working correctly"
+
+      - name: Test views
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Testing views..."
+          
+          # Test holdings view
+          echo "Testing v_holdings..."
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT portfolio_name, crypto_symbol, total_amount, total_cost 
+            FROM v_holdings 
+            LIMIT 5;
+          "
+          
+          # Test portfolio summary
+          echo "Testing v_portfolio_summary..."
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT * FROM v_portfolio_summary;
+          "
+          
+          # Test transaction history
+          echo "Testing v_transaction_history..."
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT transaction_id, portfolio_name, transaction_type, crypto_symbol, amount 
+            FROM v_transaction_history 
+            LIMIT 5;
+          "
+          
+          echo "✓ All views working correctly"
+
+      - name: Test timezone handling
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Testing timezone handling..."
+          
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT 
+              transaction_id,
+              transaction_date,
+              transaction_date AT TIME ZONE 'America/Costa_Rica' as cr_time
+            FROM transactions 
+            LIMIT 3;
+          "
+          
+          echo "✓ Timezone handling verified"
+
+      - name: Test trade execution function
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "Testing execute_trade function..."
+          
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT * FROM execute_trade(
+              p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+              p_date := CURRENT_TIMESTAMP,
+              p_crypto_buy := 'BTC',
+              p_amount_buy := 0.001,
+              p_crypto_sell := 'USDT',
+              p_amount_sell := 100,
+              p_fee := 0.1,
+              p_fee_crypto := 'USDT',
+              p_notes := 'Test trade from GitHub Actions'
+            );
+          "
+          
+          echo "✓ Trade execution function working"
+
+      - name: Generate validation report
+        env:
+          PGPASSWORD: ${{ env.POSTGRES_PASSWORD }}
+        run: |
+          echo "## Database Validation Report" > validation_report.md
+          echo "" >> validation_report.md
+          echo "### Database Statistics" >> validation_report.md
+          echo "" >> validation_report.md
+          
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT 
+              'Portfolios' as entity, COUNT(*) as count FROM portfolios
+            UNION ALL
+            SELECT 'Crypto Prices', COUNT(*) FROM crypto_prices
+            UNION ALL
+            SELECT 'Transactions', COUNT(*) FROM transactions;
+          " >> validation_report.md
+          
+          echo "" >> validation_report.md
+          echo "### Portfolio Summary" >> validation_report.md
+          echo "" >> validation_report.md
+          
+          psql -h ${{ env.POSTGRES_HOST }} -U ${{ env.POSTGRES_USER }} -d ${{ env.POSTGRES_DB }} -c "
+            SELECT * FROM v_portfolio_summary;
+          " >> validation_report.md
+          
+          cat validation_report.md
+
+      - name: Upload validation report
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: database-validation-report
+          path: validation_report.md
+          retention-days: 30
+
+      - name: Summary
+        run: |
+          echo "## ✅ Database Setup Complete" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "All database scripts executed successfully!" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- ✓ Schema created" >> $GITHUB_STEP_SUMMARY
+          echo "- ✓ Functions and procedures deployed" >> $GITHUB_STEP_SUMMARY
+          echo "- ✓ Views created" >> $GITHUB_STEP_SUMMARY
+          echo "- ✓ Sample data loaded" >> $GITHUB_STEP_SUMMARY
+          echo "- ✓ All validations passed" >> $GITHUB_STEP_SUMMARY

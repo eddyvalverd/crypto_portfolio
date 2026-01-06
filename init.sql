@@ -1,3 +1,4 @@
+--init.sql
 -- ============================================
 -- MULTI-PORTFOLIO CRYPTO TRACKER - PostgreSQL
 -- WITH DOUBLE-ENTRY ACCOUNTING

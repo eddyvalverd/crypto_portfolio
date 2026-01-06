@@ -1,3 +1,4 @@
+-- post_init.sql
 -- ============================================
 -- 2. INSERT  DATA
 -- ============================================
@@ -10,9 +11,10 @@ INSERT INTO portfolios (name, description, color) VALUES
 
 -- Sample crypto prices (including testnet tokens)
 INSERT INTO crypto_prices (symbol, name, current_price) VALUES
-    ('BTC', 'Bitcoin', 89312.00),
+    ('BTC', 'Bitcoin', 93888.00),
     ('USDT', 'Tether', 1.00),
-    ('USDC', 'USD Coin', 1.00);
+    ('USDC', 'USD Coin', 1.00),
+    ('DASH', 'DASH', 44.93);
 
 INSERT INTO public.transactions(
     portfolio_id, transaction_date, transaction_type, crypto_symbol, 
