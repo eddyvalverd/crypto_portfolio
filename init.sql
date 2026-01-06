@@ -694,6 +694,7 @@ WHERE cp.atr_30 IS NOT NULL
 -- based on 1% portfolio risk and 1.5x ATR stop-loss
 -- ============================================
 
+-- Drop and recreate the view with the new column
 CREATE OR REPLACE VIEW v_position_sizing_calculator AS
 SELECT 
     ps.portfolio_id,
@@ -703,7 +704,7 @@ SELECT
     ps.total_profit_loss_percent AS portfolio_pnl_percent,
     
     -- Risk management
-    ps.current_value * 0.01 AS risk_per_trade_usd,  -- 1% risk rule
+    ps.current_value * 0.01 AS risk_per_trade_usd,
     
     -- Cryptocurrency details
     cp.symbol AS crypto_symbol,
@@ -717,7 +718,6 @@ SELECT
     cp.current_price - (cp.atr_30 * 1.5) AS suggested_stop_loss_price,
     
     -- Position sizing
-    -- Formula: (Portfolio Value × 1%) ÷ (ATR × 1.5)
     CASE 
         WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 THEN
             (ps.current_value * 0.01) / (cp.atr_30 * 1.5)
@@ -756,15 +756,28 @@ SELECT
         ELSE 'NOT_HELD'
     END AS holding_status,
     h.total_amount AS current_holding_units,
-    h.current_value AS current_holding_value
+    h.current_value AS current_holding_value,
+    
+    -- Volatility comparison vs BTC
+    CASE 
+        WHEN cp.atr_30 IS NOT NULL AND cp.atr_30 > 0 
+         AND cp.current_price > 0
+         AND btc.atr_30 IS NOT NULL AND btc.atr_30 > 0 
+         AND btc.current_price > 0 THEN
+            (btc.atr_30 / btc.current_price) / 
+            (cp.atr_30 / cp.current_price)
+        ELSE 
+            NULL
+    END AS btc_volatility_ratio
 
 FROM v_portfolio_summary ps
 CROSS JOIN crypto_prices cp
 LEFT JOIN v_holdings h 
     ON h.portfolio_id = ps.portfolio_id 
     AND h.crypto_symbol = cp.symbol
+LEFT JOIN crypto_prices btc 
+    ON btc.symbol = 'BTC'
 
--- Filter criteria
 WHERE cp.is_stablecoin = FALSE
   AND cp.atr_30 IS NOT NULL
   AND cp.atr_30 > 0
