@@ -824,7 +824,7 @@ WHERE cp.is_stablecoin = FALSE
 
 ORDER BY 
     ps.portfolio_id,
-    cp.rank;
+    cp.symbol;
 
 
 -- ============================================
