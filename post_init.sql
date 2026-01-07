@@ -13,15 +13,21 @@ INSERT INTO portfolios (name, description, color) VALUES
 -- Sample crypto prices (including testnet tokens)
 INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30) VALUES
     ('BTC', 'Bitcoin', 93888.00, FALSE, 1938.47),
+    ('ETH', 'Ethereum', 3281, FALSE, 123.37),
+    ('XRP', 'XRP', 2.4490, FALSE, 0.0896),
+    ('SOL', 'Solana', 140.87, FALSE, 6.58),
+    ('DOGE', 'Dogecoin', 0.15032, FALSE, 0.00768),
+    ('ADA', 'Cardano', 0.4205, FALSE, 0.0251),
+    ('BCH', 'Bitcoin Cash', 639.1, FALSE, 31.4),
+    ('LINK', 'Chainlink', 14.03, FALSE, 0.67),
     ('USDT', 'Tether', 1.00, TRUE, 0.00),
     ('USDC', 'USD Coin', 1.00, TRUE, 0.00),
-    ('DASH', 'DASH', 44.93, FALSE, 2.99),
-    ('BNB', 'Binance Coin', 908.50, FALSE, 21.88),
-    ('XAUT', 'Tether Gold', 4379.20, FALSE, 64.1),
-    ('ETH', 'Ethereum', 3275.00, FALSE, 85.35),
-    ('CHZ', 'Chiliz', 0.04388, FALSE, 0.00286),
-    ('ZEC', 'ZCash', 498.12, FALSE, 41.26),
-    ('TRX', 'TRON', 0.2933, FALSE, 0.0045),
+    ('DASH', 'DASH', 44.93, FALSE, 3.55),
+    ('BNB', 'Binance Coin', 918.50, FALSE, 26.58),
+    ('XAUT', 'Tether Gold', 4491.40, FALSE, 57.4),
+    ('CHZ', 'Chiliz', 0.04388, FALSE, 0.00266),
+    ('ZEC', 'ZCash', 503.06, FALSE, 41.26),
+    ('TRX', 'TRON', 0.2942, FALSE, 0.0045),
     ('MYX', 'MYX Finance', 4.93, FALSE, 0.5963);
 
 INSERT INTO public.transactions(
