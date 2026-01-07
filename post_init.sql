@@ -317,7 +317,7 @@ SELECT * FROM execute_trade(
     p_crypto_buy := 'BTC',
     p_amount_buy := 0.654303,
     p_crypto_sell := 'USDT',
-    p_amount_sell := 60,725.8159245,
+    p_amount_sell := 60725.8159245,
     p_fee := 0.000654303919 ,
     p_fee_crypto := 'BTC',
     p_notes := 'Buy BTC with USDT on Bybit Testnet, Order ID 49554944'
