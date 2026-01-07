@@ -244,7 +244,7 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:13:02-06'::TIMESTAMPTZ,
     p_crypto_buy := 'LINK',
-    p_amount_buy := 131.75
+    p_amount_buy := 131.75,
     p_crypto_sell := 'USDC',
     p_amount_sell := 1819.4675 ,
     p_fee := 0.1251625 ,
@@ -256,7 +256,7 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:13:02-06'::TIMESTAMPTZ,
     p_crypto_buy := 'LINK',
-    p_amount_buy := 58
+    p_amount_buy := 58,
     p_crypto_sell := 'USDT',
     p_amount_sell := 800.98,
     p_fee := 0.058 ,
@@ -268,7 +268,7 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:32:49-06'::TIMESTAMPTZ,
     p_crypto_buy := 'CHZ',
-    p_amount_buy := 5416
+    p_amount_buy := 5416,
     p_crypto_sell := 'USDT',
     p_amount_sell := 234.02536,
     p_fee := 5.416 ,
@@ -280,7 +280,7 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:32:49-06'::TIMESTAMPTZ,
     p_crypto_buy := 'CHZ',
-    p_amount_buy := 5817
+    p_amount_buy := 5817,
     p_crypto_sell := 'USDT',
     p_amount_sell := 251.41074,
     p_fee := 5.817  ,
@@ -292,7 +292,7 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:32:49-06'::TIMESTAMPTZ,
     p_crypto_buy := 'CHZ',
-    p_amount_buy := 19997
+    p_amount_buy := 19997,
     p_crypto_sell := 'USDT',
     p_amount_sell := 864.47031,
     p_fee := 19.997 ,
@@ -303,7 +303,7 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:32:49-06'::TIMESTAMPTZ,
     p_crypto_buy := 'CHZ',
-    p_amount_buy := 16425
+    p_amount_buy := 16425,
     p_crypto_sell := 'USDT',
     p_amount_sell := 710.217,
     p_fee := 16.425 ,
@@ -315,7 +315,7 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
     p_date := '2026-01-06 21:53:37-06'::TIMESTAMPTZ,
     p_crypto_buy := 'BTC',
-    p_amount_buy := 0.654303
+    p_amount_buy := 0.654303,
     p_crypto_sell := 'USDT',
     p_amount_sell := 60,725.8159245,
     p_fee := 0.000654303919 ,
