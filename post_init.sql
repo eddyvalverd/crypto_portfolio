@@ -24,7 +24,7 @@ INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank
     ('USDC', 'USD Coin', 1.00, TRUE, 0.00,7),
     ('DASH', 'DASH', 41.93, FALSE, 3.55,91),
     ('BNB', 'Binance Coin', 904.79, FALSE, 26.58,5),
-    ('XAUT', 'Tether Gold', 4442.74, FALSE, 57.4,4),
+    ('XAUT', 'Tether Gold', 4442.74, FALSE, 57.4,44),
     ('CHZ', 'Chiliz', 0.04318, FALSE, 0.00266,100),
     ('ZEC', 'ZCash', 486.15, FALSE, 41.26,14),
     ('TRX', 'TRON', 0.2958, FALSE, 0.0045,8),
