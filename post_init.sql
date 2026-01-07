@@ -12,22 +12,22 @@ INSERT INTO portfolios (name, description, color) VALUES
 
 -- Sample crypto prices (including testnet tokens)
 INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank) VALUES
-    ('BTC', 'Bitcoin', 92868.00, FALSE, 1938.47,1),
-    ('ETH', 'Ethereum', 3268, FALSE, 123.37,2),
-    ('XRP', 'XRP', 2.2767, FALSE, 0.0896,4),
-    ('SOL', 'Solana', 140.04, FALSE, 6.58,6),
-    ('DOGE', 'Dogecoin', 0.14212, FALSE, 0.00768,9),
-    ('ADA', 'Cardano', 0.4144, FALSE, 0.0251,10),
-    ('BCH', 'Bitcoin Cash', 636.5, FALSE, 31.4,11),
-    ('LINK', 'Chainlink', 13.89, FALSE, 0.67,12),
+    ('BTC', 'Bitcoin', 91938.00, FALSE, 1938.47,1),
+    ('ETH', 'Ethereum', 3211, FALSE, 123.37,2),
+    ('XRP', 'XRP', 2.24, FALSE, 0.0896,4),
+    ('SOL', 'Solana', 137.82, FALSE, 6.58,6),
+    ('DOGE', 'Dogecoin', 0.1480, FALSE, 0.00768,9),
+    ('ADA', 'Cardano', 0.4115, FALSE, 0.0251,10),
+    ('BCH', 'Bitcoin Cash', 629.44, FALSE, 31.4,11),
+    ('LINK', 'Chainlink', 13.64, FALSE, 0.67,12),
     ('USDT', 'Tether', 1.00, TRUE, 0.00,3),
     ('USDC', 'USD Coin', 1.00, TRUE, 0.00,7),
-    ('DASH', 'DASH', 43.55, FALSE, 3.55),
-    ('BNB', 'Binance Coin', 906.21, FALSE, 26.58,5),
-    ('XAUT', 'Tether Gold', 4546.00, FALSE, 57.4,4),
-    ('CHZ', 'Chiliz', 0.04388, FALSE, 0.00266,100),
-    ('ZEC', 'ZCash', 496.73, FALSE, 41.26,14),
-    ('TRX', 'TRON', 0.2941, FALSE, 0.0045,8),
+    ('DASH', 'DASH', 41.93, FALSE, 3.55,91),
+    ('BNB', 'Binance Coin', 904.79, FALSE, 26.58,5),
+    ('XAUT', 'Tether Gold', 4442.74, FALSE, 57.4,4),
+    ('CHZ', 'Chiliz', 0.04318, FALSE, 0.00266,100),
+    ('ZEC', 'ZCash', 486.15, FALSE, 41.26,14),
+    ('TRX', 'TRON', 0.2958, FALSE, 0.0045,8),
     ('MYX', 'MYX Finance', 4.93, FALSE, 0.5963,60);
 
 INSERT INTO public.transactions(
