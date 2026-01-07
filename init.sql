@@ -19,8 +19,7 @@ CREATE TABLE portfolios (
     description TEXT,
     color VARCHAR(10), -- Hex color code
     created_at TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
-    is_active BOOLEAN DEFAULT TRUE,
-    rank INTEGER DEFAULT 0
+    is_active BOOLEAN DEFAULT TRUE
 );
 
 -- Cryptocurrency price tracking
@@ -31,7 +30,8 @@ CREATE TABLE crypto_prices (
     current_price DECIMAL(18, 8),
     last_updated TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
     is_stablecoin BOOLEAN DEFAULT FALSE,
-    atr_30 DECIMAL(18, 8)
+    atr_30 DECIMAL(18, 8),
+    rank INTEGER DEFAULT 0
 );
 
 -- Transaction log with 4 types: TRANSFER_IN, TRANSFER_OUT, BUY, SELL
