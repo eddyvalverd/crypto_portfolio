@@ -19,7 +19,8 @@ CREATE TABLE portfolios (
     description TEXT,
     color VARCHAR(10), -- Hex color code
     created_at TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
-    is_active BOOLEAN DEFAULT TRUE
+    is_active BOOLEAN DEFAULT TRUE,
+    rank INTEGER DEFAULT 0
 );
 
 -- Cryptocurrency price tracking
@@ -823,7 +824,7 @@ WHERE cp.is_stablecoin = FALSE
 
 ORDER BY 
     ps.portfolio_id,
-    cp.symbol;
+    cp.rank;
 
 
 -- ============================================
