@@ -712,6 +712,7 @@ SELECT
     
     -- Cryptocurrency details
     cp.symbol AS crypto_symbol,
+    cp.rank AS crypto_rank,
     cp.name AS crypto_name,
     cp.current_price,
     cp.atr_30,
