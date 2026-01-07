@@ -391,7 +391,7 @@ SELECT * FROM execute_trade(
     p_amount_sell := 33695.12,
     p_fee := 28.1241757,
     p_fee_crypto := 'ADA',
-    p_notes := 'Buy ADA with USDT on OKX Testnet, order no 3196271990135414784'
+    p_notes := 'Buy ADA with USDT on OKX Testnet, order no 3196299498058768384'
 );
 
 SELECT * FROM execute_trade(
@@ -410,10 +410,10 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
     p_date := '2026-01-06 22:40:36-06'::TIMESTAMPTZ,
     p_crypto_buy := 'CHZ',
-    p_amount_buy := 1053.8021,
+    p_amount_buy := 265431.3512,
     p_crypto_sell := 'USDT',
-    p_amount_sell := 14517.29,
-    p_fee := 1.05375865,
+    p_amount_sell := 11428.40,
+    p_fee := 265.2653205,
     p_fee_crypto := 'CHZ',
-    p_notes := 'Buy CHZ with USDT on OKX Testnet, order no 3196317317508980736'
+    p_notes := 'Buy CHZ with USDT on OKX Testnet, order no 3196342728817205248'
 );
