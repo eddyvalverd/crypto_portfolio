@@ -10,7 +10,7 @@ INSERT INTO portfolios (name, description, color) VALUES
     ('OKX Testnet Portfolio', 'OKX Testnet Trading Account', '#d9cfcfff'),
     ('Binance Main Portfolio', 'Binance Main Trading Account', '#ff0000e4');
 
--- Sample crypto prices (including testnet tokens)
+-- Top crypto prices (Based on Tradingview data as of 2024-08-01)
 INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank) VALUES
     ('BTC', 'Bitcoin', 93188.00, FALSE, 1938.47,1),
     ('ETH', 'Ethereum', 3106, FALSE, 123.37,2),
@@ -24,6 +24,8 @@ INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank
     ('ADA', 'Cardano', 0.4137, FALSE, 0.0251,10),
     ('BCH', 'Bitcoin Cash', 629.44, FALSE, 31.4,11),
     ('LINK', 'Chainlink', 13.62, FALSE, 0.67,12),
+    ('HYPEH', 'Hyperliquid', 26.042, FALSE, 1.759,13),
+    ('XMR', 'Monero', 455.62, FALSE, 24.22,13),
     ('ZEC', 'ZCash', 373.46, FALSE, 41.26,14),
     ('XAUT', 'Tether Gold', 4546.00, FALSE, 57.4,44),
     ('DASH', 'DASH', 46.31, FALSE, 3.55,91),
@@ -485,7 +487,40 @@ SELECT * FROM execute_trade(
     p_notes := 'Buy CHZ with USDT on OKX Testnet, order no 3196342728817205248'
 );
 --
+-- Record the DOGE/USDT trade in Binance Testnet portfolio on 2026-01-08
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-08 16:44:06-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'DOGE',
+    p_amount_buy := 1542,
+    p_crypto_sell := 'USDC',
+    p_amount_sell := 219,
+    p_fee := 1.4649 ,
+    p_fee_crypto := 'DOGE',
+    p_notes := 'Buy DOGE with USDC on Binance Testnet, Order No 149497050'
+);
 
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-08 16:44:06-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'DOGE',
+    p_amount_buy := 13769,
+    p_crypto_sell := 'USDC',
+    p_amount_sell := 1955,
+    p_fee := 13.08055 ,
+    p_fee_crypto := 'DOGE',
+    p_notes := 'Buy DOGE with USDC on Binance Testnet, Order No 149497050'
+);
 
-
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-08 16:44:06-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'DOGE',
+    p_amount_buy := 628,
+    p_crypto_sell := 'USDC',
+    p_amount_sell := 89,
+    p_fee := 0.05966 ,
+    p_fee_crypto := 'DOGE',
+    p_notes := 'Buy DOGE with USDC on Binance Testnet, Order No 149497050'
+);
 
