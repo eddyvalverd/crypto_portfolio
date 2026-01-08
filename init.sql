@@ -722,6 +722,8 @@ SELECT
     -- Stop-loss calculation (1.5x ATR below current price)
     cp.atr_30 * 1.5 AS stop_distance_atr,
     cp.current_price - (cp.atr_30 * 1.5) AS suggested_stop_loss_price,
+    cp.current_price - (cp.atr_30 * 1) AS min_stop_loss_price,
+    cp.current_price - (cp.atr_30 * 2) AS max_stop_loss_price,
     
     -- Position sizing
     CASE 
