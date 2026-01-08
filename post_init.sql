@@ -164,12 +164,20 @@ INSERT INTO transactions (
     'BNB fee for DASH/USDT trade'
 );
 
--- Verify your balances after the trade
-SELECT * FROM get_portfolio_balances(
-    (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio')
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-08 04:01:47-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'USDT',
+    p_amount_buy := 1266.3018,
+    p_crypto_sell := 'DASH',
+    p_amount_sell := 33.58,
+    p_fee := 1.2663018,
+    p_fee_crypto := 'USDT',
+    p_notes := 'Buy USDT with DASH on Binance, order No. 152632978'
 );
 
--- Record the DASH/USDT trade
+
+-- Record the ZEC/USDT trade in Binance Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 14:19:41-06'::TIMESTAMPTZ,
@@ -183,6 +191,19 @@ SELECT * FROM execute_trade(
 );
 
 SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-08 02:26:47-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'USDT',
+    p_amount_buy := 1343,15217,
+    p_crypto_sell := 'ZEC',
+    p_amount_sell := 3.079,
+    p_fee := 1.1,
+    p_fee_crypto := 'USDT',
+    p_notes := 'Buy USDT with ZEC on Binance Testnet, order no 585028026'
+);
+--
+-- Record the ZEC/USDT trade in OKX Testnet portfolio on 2026-01-06
+SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
     p_date := '2026-01-06 14:52:07-06'::TIMESTAMPTZ,
     p_crypto_buy := 'ZEC',
@@ -193,19 +214,32 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'ZEC',
     p_notes := 'Buy ZEC with USDT on OKX Testnet, order no 3195399537557331968'
 );
-
+--
+-- Record the BTC/USDT trade in Binance Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 09:10:39-06'::TIMESTAMPTZ,
     p_crypto_buy := 'BTC',
-    p_amount_buy := 92969.49,
+    p_amount_buy := 0.06539,
     p_crypto_sell := 'USDC',
     p_amount_sell := 6079.2749511,
     p_fee := 0.00006212,
     p_fee_crypto := 'BTC',
     p_notes := 'Buy BTC with USDC on Binance Testnet, order no 444647893'
 );
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
+    p_date := '2026-01-08 00:59:24-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'USDC',
+    p_amount_buy := 5870.3084,
+    p_crypto_sell := 'BTC',
+    p_amount_sell := 0.06532,
+    p_fee := 5.8703084,
+    p_fee_crypto := 'USDC',
+    p_notes := 'Buy USDC with BTC on Binance Testnet, order no 444668481'
+);
 
+-- Record the SOL/USDT trade in Binance Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:02:04-06'::TIMESTAMPTZ,
@@ -217,7 +251,7 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'SOL',
     p_notes := 'Buy SOL with USDT on Binance Testnet, order no 587133075'
 );
-
+-- Record the ADA/USDT trade in Binance Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:13:02-06'::TIMESTAMPTZ,
@@ -241,7 +275,7 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'BNB',
     p_notes := 'Buy ADA with USDT on Binance Testnet, , order no 201877196'
 );
-
+-- Record the LINK/USDT trade in Binance Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:13:02-06'::TIMESTAMPTZ,
@@ -265,7 +299,7 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'LINK',
     p_notes := 'Buy ADA with USDT on Binance Testnet, order no104044101'
 );
-
+-- Record the CHZ/USDT trade in Binance Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-06 22:32:49-06'::TIMESTAMPTZ,
@@ -312,7 +346,7 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'CHZ',
     p_notes := 'Buy CHZ with USDT on Binance Testnet, Order No 49853456'
 );
-
+-- Record the BTC/USDT trade in Bybit Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
     p_date := '2026-01-06 21:53:37-06'::TIMESTAMPTZ,
@@ -327,6 +361,21 @@ SELECT * FROM execute_trade(
 
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
+    p_date := '2026-01-08 01:53:21-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'USDT',
+    p_amount_buy := 58743.43563,
+    p_crypto_sell := 'BTC',
+    p_amount_sell := 0.653649,
+    p_fee := 58.74343563 ,
+    p_fee_crypto := 'USDT',
+    p_notes := 'Buy USDT with BTC on Bybit Testnet, Order ID 96807067'
+);
+
+--
+-- Record the ADA/USDT trade in Bybit Testnet portfolio on 2026-01-06
+
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
     p_date := '2026-01-06 22:16:22-06'::TIMESTAMPTZ,
     p_crypto_buy := 'ADA',
     p_amount_buy := 50781.99,
@@ -336,7 +385,8 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'ADA',
     p_notes := 'Buy ADA with USDC on Bybit Testnet, Order ID 71421696'
 );
-
+--
+-- Record the LINK/USDT trade in Bybit Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
     p_date := '2026-01-06 22:26:09-06'::TIMESTAMPTZ,
@@ -348,7 +398,8 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'LINK',
     p_notes := 'Buy LINK with USDT on Bybit Testnet, Order ID 37497344'
 );
-
+--
+-- Record the CHZ/USDT trade in Bybit Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Bybit Testnet Portfolio'),
     p_date := '2026-01-06 22:26:09-06'::TIMESTAMPTZ,
@@ -360,7 +411,7 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'CHZ',
     p_notes := 'Buy CHZ with USDC on Bybit Testnet, Order ID 88075008'
 );
-
+--  BTC/USDT trades on OKX Testnet 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
     p_date := '2026-01-06 21:57:25-06'::TIMESTAMPTZ,
@@ -375,6 +426,19 @@ SELECT * FROM execute_trade(
 
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
+    p_date := '2026-01-08 01:00:30-06'::TIMESTAMPTZ,
+    p_crypto_buy := 'USDT',
+    p_amount_buy := 32636.03,
+    p_crypto_sell := 'BTC',
+    p_amount_sell := 0.36365619,
+    p_fee := 26.14542543,
+    p_fee_crypto := 'USDT',
+    p_notes := 'Buy USDT with BTC on OKX Testnet, order no 3199523502408155136'
+);
+--
+-- Record the SOL/USDT trade in OKX Testnet portfolio on 2026-01-06
+SELECT * FROM execute_trade(
+    p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
     p_date := '2026-01-06 22:05:28-06'::TIMESTAMPTZ,
     p_crypto_buy := 'SOL',
     p_amount_buy := 107.302035,
@@ -384,6 +448,7 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'SOL',
     p_notes := 'Buy SOL with USDT on OKX Testnet, order no 3196271990135414784'
 );
+-- Record the ADA/USDT trade in OKX Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
     p_date := '2026-01-06 22:19:08-06'::TIMESTAMPTZ,
@@ -395,7 +460,7 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'ADA',
     p_notes := 'Buy ADA with USDT on OKX Testnet, order no 3196299498058768384'
 );
-
+-- Record the LINK/USDT trade in OKX Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
     p_date := '2026-01-06 22:27:59-06'::TIMESTAMPTZ,
@@ -407,7 +472,7 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'LINK',
     p_notes := 'Buy LINK with USDT on OKX Testnet, order no 3196317317508980736'
 );
-
+-- Record the CHZ/USDT trade in OKX Testnet portfolio on 2026-01-06
 SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'OKX Testnet Portfolio'),
     p_date := '2026-01-06 22:40:36-06'::TIMESTAMPTZ,
@@ -419,3 +484,8 @@ SELECT * FROM execute_trade(
     p_fee_crypto := 'CHZ',
     p_notes := 'Buy CHZ with USDT on OKX Testnet, order no 3196342728817205248'
 );
+--
+
+
+
+
