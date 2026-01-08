@@ -194,7 +194,7 @@ SELECT * FROM execute_trade(
     p_portfolio_id := (SELECT portfolio_id FROM portfolios WHERE name = 'Binance Testnet Portfolio'),
     p_date := '2026-01-08 02:26:47-06'::TIMESTAMPTZ,
     p_crypto_buy := 'USDT',
-    p_amount_buy := 1343,15217,
+    p_amount_buy := 1343.15217,
     p_crypto_sell := 'ZEC',
     p_amount_sell := 3.079,
     p_fee := 1.1,
