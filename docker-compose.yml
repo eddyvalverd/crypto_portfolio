@@ -1,5 +1,3 @@
-
-
 services:
   # PostgreSQL Database
   postgres:
@@ -45,6 +43,43 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+  # CSV Export Service
+  csv_exporter:
+    image: postgres:16-alpine
+    container_name: crypto_csv_exporter
+    restart: "no"
+    environment:
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: postgres
+    volumes:
+      - ./exports:/exports
+    networks:
+      - crypto_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: >
+      sh -c "
+      psql -c \"COPY (
+        SELECT 
+          portfolio_id, portfolio_name, portfolio_value, portfolio_pnl, 
+          portfolio_pnl_percent, risk_per_trade_usd, crypto_symbol, crypto_rank, 
+          crypto_name, current_price, atr_30, is_stablecoin, 
+          trend_confirmation_percent, volatility_ratio, stop_distance_atr, 
+          suggested_stop_loss_price, min_stop_loss_price, max_stop_loss_price, 
+          position_size_units, position_size_usd, position_weight_percent, 
+          stop_loss_percent, holding_status, current_holding_units, 
+          current_holding_value, btc_volatility_ratio, shortdays, mediumdays, longdays
+        FROM public.v_position_sizing_calculator 
+        WHERE portfolio_id = 1 AND crypto_rank < 13 
+        ORDER BY crypto_rank ASC
+      ) TO STDOUT WITH CSV HEADER\" > /exports/position_sizing_$(date +%Y%m%d_%H%M%S).csv &&
+      echo 'CSV export completed successfully'
+      "
 
 volumes:
   postgres_data:
