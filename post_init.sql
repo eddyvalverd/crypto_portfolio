@@ -12,18 +12,18 @@ INSERT INTO portfolios (name, description, color) VALUES
 
 -- Top crypto prices (Based on Tradingview data as of 2024-08-01)
 INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank) VALUES
-    ('BTC', 'Bitcoin', 90644.00, FALSE, 2544.89,1),
-    ('ETH', 'Ethereum', 3088, FALSE, 116.89,2),
+    ('BTC', 'Bitcoin', 90785.00, FALSE, 2335.89,1),
+    ('ETH', 'Ethereum', 3124.43, FALSE, 106.53,2),
     ('USDT', 'Tether', 1.00, TRUE, 0.00,3),
-    ('XRP', 'XRP', 2.0961, FALSE, 0.0951,4),
-    ('BNB', 'Binance Coin', 896.09, FALSE, 25.22,5),
-    ('SOL', 'Solana', 136.0, FALSE, 5.93,6),
+    ('XRP', 'XRP', 2.093, FALSE, 0.0904,4),
+    ('BNB', 'Binance Coin', 904.79, FALSE, 24.29,5),
+    ('SOL', 'Solana', 139.65, FALSE, 5.56,6),
     ('USDC', 'USD Coin', 1.00, TRUE, 0.00,7),
-    ('TRX', 'TRON', 0.29782, FALSE, 0.00452,8),
-    ('DOGE', 'Dogecoin', 0.14067, FALSE, 0.00742,9),
-    ('ADA', 'Cardano', 0.3916, FALSE, 0.023,10),
-    ('BCH', 'Bitcoin Cash', 635.5, FALSE, 29.53,11),
-    ('LINK', 'Chainlink', 13.127, FALSE, 0.610,12),
+    ('TRX', 'TRON', 0.30154, FALSE, 0.00448,8),
+    ('DOGE', 'Dogecoin', 0.13812, FALSE, 0.00713,9),
+    ('ADA', 'Cardano', 0.39387, FALSE, 0.02122,10),
+    ('BCH', 'Bitcoin Cash', 656.35, FALSE, 29.53,11),
+    ('LINK', 'Chainlink', 13.294, FALSE, 0.562,12),
     ('HYPEH', 'Hyperliquid', 26.042, FALSE, 1.759,13),--No continuar con ese
     ('XMR', 'Monero', 455.62, FALSE, 24.22,13),
     ('ZEC', 'ZCash', 373.46, FALSE, 41.26,14),
