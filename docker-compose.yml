@@ -73,7 +73,11 @@ services:
           suggested_stop_loss_price, min_stop_loss_price, max_stop_loss_price, 
           position_size_units, position_size_usd, position_weight_percent, 
           stop_loss_percent, holding_status, current_holding_units, 
-          current_holding_value, btc_volatility_ratio, shortdays, mediumdays, longdays
+          current_holding_value, btc_volatility_ratio, shortdays, mediumdays, longdays,
+          trend_confirmation_percent % current_price + current_price AS trend_confirmation_price,
+          suggested_buy_price,
+          min_buy_price,
+          max_buy_price
         FROM public.v_position_sizing_calculator 
         WHERE portfolio_id = 1 AND crypto_rank < 13 
         ORDER BY crypto_rank ASC
