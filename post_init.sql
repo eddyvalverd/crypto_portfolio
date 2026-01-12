@@ -23,7 +23,7 @@ INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank
     ('DOGE', 'Dogecoin', 0.12684, FALSE, 0.00884,9),
     ('ADA', 'Cardano', 0.3911, FALSE, 0.02705,10), --When to buy and stop loss calculation
     ('BCH', 'Bitcoin Cash', 656.35, FALSE, 34.9,11),
-    ('LINK', 'Chainlink', 13.64, FALSE, 0.75,12), --When to buy and stop loss calculation
+    ('LINK', 'Chainlink', 14.5, FALSE, 0.75,12), --When to buy and stop loss calculation
     ('HYPEH', 'Hyperliquid', 26.042, FALSE, 0.0150,13),--No continuar con ese
     ('XMR', 'Monero', 455.62, FALSE, 24.22,13),
     ('ZEC', 'ZCash', 373.46, FALSE, 41.26,14),
