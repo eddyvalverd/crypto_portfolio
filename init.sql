@@ -724,9 +724,9 @@ SELECT
     cp.current_price - (cp.atr_30 * 1.5) AS suggested_stop_loss_price,
     cp.current_price - (cp.atr_30 * 1) AS min_stop_loss_price,
     cp.current_price - (cp.atr_30 * 2) AS max_stop_loss_price,
-    cp.current_price + (cp.atr_30 * 1.75) AS suggested_buy_price,
-    cp.current_price + (cp.atr_30 * 1.5) AS min_buy_price,
-    cp.current_price + (cp.atr_30 * 2) AS max_buy_price,
+    cp.current_price + (cp.atr_30 * 1.6821891) AS suggested_buy_price,
+    --cp.current_price + (cp.atr_30 * 1.5) AS min_buy_price,
+    --cp.current_price + (cp.atr_30 * 2) AS max_buy_price,
     
     -- Position sizing
     CASE 
