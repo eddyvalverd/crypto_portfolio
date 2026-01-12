@@ -70,7 +70,7 @@ services:
           portfolio_pnl_percent, risk_per_trade_usd, crypto_symbol, crypto_rank, 
           crypto_name, current_price, atr_30, is_stablecoin, 
           trend_confirmation_percent,
-          trend_confirmation_percent % current_price + current_price AS trend_confirmation_price,
+          ((trend_confirmation_percent*0.01) * current_price) + current_price AS trend_confirmation_price,
           volatility_ratio, stop_distance_atr, 
           suggested_stop_loss_price, min_stop_loss_price, max_stop_loss_price, 
           position_size_units, position_size_usd, position_weight_percent, 
