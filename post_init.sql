@@ -16,14 +16,14 @@ INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank
     ('ETH', 'Ethereum', 3124.43, FALSE, 106.53,2),
     ('USDT', 'Tether', 1.00, TRUE, 0.00,3),
     ('XRP', 'XRP', 2.093, FALSE, 0.0904,4),
-    ('BNB', 'Binance Coin', 904.79, FALSE, 24.29,5),
-    ('SOL', 'Solana', 139.65, FALSE, 5.56,6),
+    ('BNB', 'Binance Coin', 920, FALSE, 32.69,5), --When to buy and stop loss calculation
+    ('SOL', 'Solana', 144, FALSE, 7.46,6), --When to buy and stop loss calculation
     ('USDC', 'USD Coin', 1.00, TRUE, 0.00,7),
     ('TRX', 'TRON', 0.30154, FALSE, 0.00448,8),
     ('DOGE', 'Dogecoin', 0.13812, FALSE, 0.00713,9),
     ('ADA', 'Cardano', 0.39387, FALSE, 0.02122,10),
     ('BCH', 'Bitcoin Cash', 656.35, FALSE, 29.53,11),
-    ('LINK', 'Chainlink', 13.294, FALSE, 0.562,12),
+    ('LINK', 'Chainlink', 14.5, FALSE, 0.76,12), --When to buy and stop loss calculation
     ('HYPEH', 'Hyperliquid', 26.042, FALSE, 1.759,13),--No continuar con ese
     ('XMR', 'Monero', 455.62, FALSE, 24.22,13),
     ('ZEC', 'ZCash', 373.46, FALSE, 41.26,14),
