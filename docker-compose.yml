@@ -81,7 +81,7 @@ services:
           stop_loss_percent, holding_status, current_holding_units, 
           current_holding_value, btc_volatility_ratio, shortdays, mediumdays, longdays          
         FROM public.v_position_sizing_calculator 
-        WHERE portfolio_id = 1 AND crypto_rank < 13 
+        WHERE portfolio_id = 4 AND crypto_rank < 13 
         ORDER BY volatility_ratio ASC
       ) TO STDOUT WITH CSV HEADER\" > /exports/position_sizing_$(date +%Y%m%d_%H%M%S).csv &&
       echo 'CSV export completed successfully'

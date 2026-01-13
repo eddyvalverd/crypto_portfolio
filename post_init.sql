@@ -20,7 +20,7 @@ INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank
     ('SOL', 'Solana', 145, FALSE, 7.41,6, TRUE), --When to buy and stop loss calculation
     ('USDC', 'USD Coin', 1.00, TRUE, 0.00,7, FALSE),
     ('TRX', 'TRON', 0.30154, FALSE, 0.005,8, FALSE),
-    ('DOGE', 'Dogecoin', 0.12684, FALSE, 0.00884,9, FALSE),
+    ('DOGE', 'Dogecoin', 0.1306, FALSE, 0.00884,9, FALSE),
     ('ADA', 'Cardano', 0.3911, FALSE, 0.02705,10, TRUE), --When to buy and stop loss calculation
     ('BCH', 'Bitcoin Cash', 656.35, FALSE, 34.9,11, FALSE), 
     ('LINK', 'Chainlink', 14.64, FALSE, 0.75,12, TRUE), --When to buy and stop loss calculation
@@ -29,7 +29,7 @@ INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank
     ('ZEC', 'ZCash', 373.46, FALSE, 41.26,14, FALSE),
     ('XAUT', 'Tether Gold', 4546.00, FALSE, 57.4,44, FALSE),
     ('DASH', 'DASH', 46.31, FALSE, 3.55,91, FALSE),
-    ('CHZ', 'Chiliz', 0.04245, FALSE, 0.00266,100, FALSE),
+    ('CHZ', 'Chiliz', 0.03989, FALSE, 0.00266,100, FALSE),
 
 
     ('MYX', 'MYX Finance', 4.93, FALSE, 0.5963,60, FALSE);
