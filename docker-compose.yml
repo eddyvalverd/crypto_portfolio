@@ -72,9 +72,11 @@ services:
           has_pattern_to_break,
           trend_confirmation_percent,
           ((trend_confirmation_percent*0.01) * current_price) + current_price AS trend_confirmation_price,
-          suggested_buy_price,
+          suggested_buy_price_golden_ratio,
+          suggested_buy_price_glen,          
           volatility_ratio, stop_distance_atr, 
-          suggested_stop_loss_price, min_stop_loss_price, max_stop_loss_price, 
+          suggested_stop_loss_price, suggested_stop_loss_price_golden_ratio, suggested_stop_loss_price_glen,
+          min_stop_loss_price, max_stop_loss_price, 
           position_size_units, position_size_usd, position_weight_percent, 
           stop_loss_percent, holding_status, current_holding_units, 
           current_holding_value, btc_volatility_ratio, shortdays, mediumdays, longdays          

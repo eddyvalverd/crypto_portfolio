@@ -724,9 +724,12 @@ SELECT
     -- Stop-loss calculation (1.5x ATR below current price)
     cp.atr_30 * 1.5 AS stop_distance_atr,
     cp.current_price - (cp.atr_30 * 1.5) AS suggested_stop_loss_price,
+    cp.current_price - (cp.atr_30 * 1.61803) AS suggested_stop_loss_price_golden_ratio,
+    cp.current_price - (cp.atr_30 * 1.6821891) AS suggested_stop_loss_price_glen, --Base on Glen goodman 5% recommendation
     cp.current_price - (cp.atr_30 * 1) AS min_stop_loss_price,
     cp.current_price - (cp.atr_30 * 2) AS max_stop_loss_price,
-    cp.current_price + (cp.atr_30 * 1.6821891) AS suggested_buy_price,
+    cp.current_price + (cp.atr_30 * 1.6821891) AS suggested_buy_price_glen, --Base on Glen goodman 5% recommendation
+    cp.current_price + (cp.atr_30 * 1.61803) AS suggested_buy_price_golden_ratio,
     --cp.current_price + (cp.atr_30 * 1.5) AS min_buy_price,
     --cp.current_price + (cp.atr_30 * 2) AS max_buy_price,
     
