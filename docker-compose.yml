@@ -69,6 +69,7 @@ services:
           portfolio_id, portfolio_name, portfolio_value, portfolio_pnl, 
           portfolio_pnl_percent, risk_per_trade_usd, crypto_symbol, crypto_rank, 
           crypto_name, current_price, atr_30, is_stablecoin, 
+          has_pattern_to_break,
           trend_confirmation_percent,
           ((trend_confirmation_percent*0.01) * current_price) + current_price AS trend_confirmation_price,
           suggested_buy_price,
