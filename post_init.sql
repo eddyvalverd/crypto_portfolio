@@ -13,7 +13,7 @@ INSERT INTO portfolios (name, description, color) VALUES
 -- Top crypto prices (Based on Tradingview data as of 2024-08-01)
 INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank,has_pattern_to_break) VALUES
     ('BTC', 'Bitcoin', 93850.00, FALSE, 2789.52,1, TRUE), --When to buy and stop loss calculation
-    ('ETH', 'Ethereum', 3224, FALSE, 137.57,2, TRUE), --When to buy and stop loss calculation
+    ('ETH', 'Ethereum', 3324, FALSE, 137.57,2, TRUE), --When to buy and stop loss calculation
     ('USDT', 'Tether', 1.00, TRUE, 0.00,3, FALSE),
     ('XRP', 'XRP', 1.88, FALSE, 0.1094,4, TRUE),--When to buy and stop loss calculation
     ('BNB', 'Binance Coin', 920, FALSE, 32.22,5, TRUE), --When to buy and stop loss calculation
@@ -22,9 +22,8 @@ INSERT INTO crypto_prices (symbol, name, current_price,is_stablecoin,atr_30,rank
     ('TRX', 'TRON', 0.30154, FALSE, 0.005,8, FALSE),
     ('DOGE', 'Dogecoin', 0.12684, FALSE, 0.00884,9, FALSE),
     ('ADA', 'Cardano', 0.3911, FALSE, 0.02705,10, TRUE), --When to buy and stop loss calculation
-    ('BCH', 'Bitcoin Cash', 656.35, FALSE, 34.9,11, TRUE), --When to buy and stop loss calculation
-    ('LTC', 'Litecoin', 189.45, FALSE, 8.76,12, TRUE), --When to buy and stop loss calculation
-    ('LINK', 'Chainlink', 14.5, FALSE, 0.75,12, TRUE), --When to buy and stop loss calculation
+    ('BCH', 'Bitcoin Cash', 656.35, FALSE, 34.9,11, FALSE), 
+    ('LINK', 'Chainlink', 14.64, FALSE, 0.75,12, TRUE), --When to buy and stop loss calculation
     ('HYPEH', 'Hyperliquid', 26.042, FALSE, 0.0150,13, FALSE),--No continuar con ese
     ('XMR', 'Monero', 455.62, FALSE, 24.22,13, FALSE),
     ('ZEC', 'ZCash', 373.46, FALSE, 41.26,14, FALSE),
