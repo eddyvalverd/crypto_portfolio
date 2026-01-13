@@ -31,7 +31,8 @@ CREATE TABLE crypto_prices (
     last_updated TIMESTAMPTZ DEFAULT (CURRENT_TIMESTAMP AT TIME ZONE 'America/Costa_Rica'),
     is_stablecoin BOOLEAN DEFAULT FALSE,
     atr_30 DECIMAL(18, 8),
-    rank INTEGER DEFAULT 0
+    rank INTEGER DEFAULT 0,
+    has_pattern_to_break BOOLEAN DEFAULT FALSE
 );
 
 -- Transaction log with 4 types: TRANSFER_IN, TRANSFER_OUT, BUY, SELL
@@ -717,6 +718,7 @@ SELECT
     cp.current_price,
     cp.atr_30,
     cp.is_stablecoin,
+    cp.has_pattern_to_break,
     (cp.atr_30 / cp.current_price) / (btc.atr_30 / btc.current_price) * 5  AS trend_confirmation_percent,
     (cp.atr_30 / cp.current_price) as volatility_ratio,
     -- Stop-loss calculation (1.5x ATR below current price)
