@@ -18,13 +18,25 @@ jobs:
       - name: Create exports directory
         run: mkdir -p exports
 
-      - name: Install Docker Compose
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y docker-compose
-
       - name: Start Docker Compose
         run: docker-compose up -d
+
+      - name: Wait for csv_exporter service to complete
+        run: |
+          echo "Waiting for csv_exporter service to complete..."
+          for i in {1..120}; do
+            status=$(docker-compose ps csv_exporter 2>&1)
+            if echo "$status" | grep -q "Exit\|exited"; then
+              echo "csv_exporter service has completed!"
+              break
+            fi
+            echo "Attempt $i/120 - Service still running, waiting..."
+            sleep 5
+          done
+          if ! docker-compose ps csv_exporter 2>&1 | grep -q "Exit\|exited"; then
+            echo "csv_exporter service did not complete in time."
+            exit 1
+          fi
 
       - name: Wait for CSV export
         run: |
