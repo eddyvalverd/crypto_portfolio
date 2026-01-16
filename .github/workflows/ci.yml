@@ -1,0 +1,43 @@
+name: Crypto Portfolio CI
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Runs every day at 00:00 UTC
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Create exports directory
+        run: mkdir -p exports
+
+      - name: Start Docker Compose
+        run: docker-compose up -d
+
+      - name: Wait for CSV export
+        run: |
+          echo "Waiting for CSV file in exports directory..."
+          for i in {1..60}; do
+            if ls exports/*.csv 1> /dev/null 2>&1; then
+              echo "CSV file found!"
+              break
+            fi
+            sleep 5
+          done
+          if ! ls exports/*.csv 1> /dev/null 2>&1; then
+            echo "No CSV file found after waiting."
+            exit 1
+          fi
+
+      - name: Upload CSV exports as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: csv-exports
+          path: exports/*.csv
