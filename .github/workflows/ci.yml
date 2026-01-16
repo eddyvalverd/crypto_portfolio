@@ -18,6 +18,11 @@ jobs:
       - name: Create exports directory
         run: mkdir -p exports
 
+      - name: Install Docker Compose
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-compose
+
       - name: Start Docker Compose
         run: docker-compose up -d
 
